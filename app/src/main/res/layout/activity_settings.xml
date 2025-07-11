@@ -14,14 +14,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:drawablePadding="8dp"
+        android:drawablePadding="24dp"
         android:paddingTop="14dp"
         android:paddingBottom="16dp"
 
         android:text="@string/settings"
         android:textColor="@color/YP_Black"
         android:textSize="@dimen/text_size_default"
-        app:drawableStartCompat="@drawable/ic_arrow_back" />
+        app:drawableStartCompat = "@drawable/ic_back_arrow_24"/>
 
 
     <FrameLayout
@@ -68,7 +68,7 @@
             android:layout_gravity="end|center_vertical"
             android:contentDescription="@string/icon_share"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_share" />
+            android:src="@drawable/ic_share_24" />
 
     </FrameLayout>
 
@@ -93,7 +93,7 @@
             android:layout_gravity="end|center_vertical"
             android:contentDescription="@string/icon_support"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_support" />
+            android:src="@drawable/ic_support_24" />
 
     </FrameLayout>
 
@@ -118,7 +118,7 @@
             android:layout_gravity="end|center_vertical"
             android:contentDescription="@string/arrow_forward"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_arrow_forward" />
+            android:src="@drawable/ic_forward_arrow_24" />
 
     </FrameLayout>
 
