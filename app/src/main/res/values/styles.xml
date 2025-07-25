@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ButtonMainScreen" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginTop">@dimen/btn_main_margin_top</item>
+        <item name="backgroundTint">@color/YP_White</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:textColor">@color/YP_Black</item>
+        <item name="cornerRadius">@dimen/btn_corner_radius</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">@dimen/ic_padding_right</item>
+        <item name="iconTint">@color/YP_Black</item>
+    </style>
+
+    <style name="TextViewTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:drawablePadding">24dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="drawableTint">?attr/colorOnPrimary</item>
+        <item name="drawableStartCompat">@drawable/ic_back_arrow_24</item>
+    </style>
+
+    <style name="FrameLayoutSettings">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingVertical">@dimen/padding_vertical_settings</item>
+        <item name="android:paddingRight">@dimen/padding_right_settings</item>
+    </style>
+
+    <style name="TextViewSettings">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">start|center_vertical</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="ImageViewSettings">
+        <item name="android:layout_width">@dimen/ic_size_default</item>
+        <item name="android:layout_height">@dimen/ic_size_default</item>
+        <item name="android:layout_gravity">end|center_vertical</item>
+        <item name="android:scaleType">centerCrop</item>
+    </style>
+
+</resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="YSMedium22">
+        <item name="fontFamily">@font/ys_display_medium</item>
+        <item name="android:textFontWeight">500</item>
+        <item name="android:textSize">@dimen/text_size_default</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+    <style name="YSRegular16">
+        <item name="fontFamily">@font/ys_display_regular</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:textSize">@dimen/text_size_settings</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+</resources>
