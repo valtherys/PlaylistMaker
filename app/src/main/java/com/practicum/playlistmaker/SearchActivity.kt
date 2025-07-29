@@ -15,18 +15,13 @@ class SearchActivity : AppCompatActivity() {
     private var query: String = QUERY_DEF
     lateinit var inputEditText: EditText
 
-    companion object {
-        const val QUERY = "QUERY"
-        const val QUERY_DEF = ""
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        val backBtn = findViewById<TextView>(R.id.backTextView)
-        val clearBtn = findViewById<ImageView>(R.id.clearIc)
-        inputEditText = findViewById(R.id.inputEditText)
+        val backBtn = findViewById<TextView>(R.id.btn_back)
+        val clearBtn = findViewById<ImageView>(R.id.iv_clear)
+        inputEditText = findViewById(R.id.et_search)
         val inputMethodManager =
             getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
 
@@ -45,7 +40,7 @@ class SearchActivity : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearBtn.visibility = clearButtonVisibility(s)
-                if (clearBtn.visibility == 8) inputMethodManager?.hideSoftInputFromWindow(
+                if (clearBtn.visibility == View.GONE) inputMethodManager?.hideSoftInputFromWindow(
                     inputEditText.windowToken,
                     0
                 )
@@ -67,6 +62,11 @@ class SearchActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
         query = savedInstanceState.getString(QUERY, QUERY_DEF)
         inputEditText.setText(query)
+    }
+
+    companion object {
+        private const val QUERY = "QUERY"
+        private const val QUERY_DEF = ""
     }
 }
 
