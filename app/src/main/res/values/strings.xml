@@ -10,4 +10,12 @@
     <string name="arrow_forward">Стрелка вперед</string>
     <string name="icon_support">Иконка Поддержка</string>
     <string name="icon_share">Иконка поделиться</string>
+    <string name="course_link">https://practicum.yandex.ru/android-developer/</string>
+    <string name="share_link">Поделиться ссылкой</string>
+    <string name="choose_mail_app">Выберите почтовое приложение:</string>
+    <string name="letter_address">melikhovainna@gmail.com</string>
+    <string name="letter_subject">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
+    <string name="letter_text">Спасибо разработчикам и разработчицам за крутое приложение!</string>
+    <string name="agreement_link">https://yandex.ru/legal/practicum_offer/</string>
+    <string name="clear">clear</string>
 </resources>
