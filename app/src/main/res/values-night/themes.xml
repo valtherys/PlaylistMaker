@@ -8,5 +8,6 @@
         <item name="colorOnSecondary">@color/YP_White</item>
 
         <item name="colorAccent">@color/YP_Blue</item>
+        <item name="colorOnSurfaceVariant">@color/YP_White</item>
     </style>
 </resources>

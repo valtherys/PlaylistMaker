@@ -13,7 +13,7 @@
         android:layout_marginEnd="8dp"
         android:contentDescription="@string/album_cover"
         android:scaleType="fitCenter"
-        tools:src="@drawable/ic_library_music_24" />
+        tools:src="@drawable/ic_placeholder_45" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -32,15 +32,39 @@
             android:textAppearance="@style/YSRegular16"
             tools:text="Yesterday (Remastered 2009)" />
 
-        <TextView
-            android:id="@+id/track_artist"
-            style="@style/TextViewSinger"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textAppearance="@style/YSRegular11"
-            tools:text="The Beatles • 3:45" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/track_artist"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textAppearance="@style/YSRegular11"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                tools:text="The Beatles The Beatles The Beatles The Beatles The Beatles The Beatles " />
+
+            <ImageView
+                android:layout_width="13dp"
+                android:layout_height="13dp"
+                android:contentDescription="@string/circle_separator"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_circle_gray_13" />
+
+            <TextView
+                android:id="@+id/track_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/YSRegular11"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                tools:text="3:45" />
+        </LinearLayout>
+
     </LinearLayout>
 
     <ImageView
