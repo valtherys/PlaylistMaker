@@ -12,4 +12,12 @@
     <style name="EditTextSearch">
         <item name="android:textColorHint">@color/YP_Text_Gray</item>
     </style>
+
+    <style name="TextViewSongTitle">
+        <item name="android:textColor">@color/YP_Black</item>
+    </style>
+
+    <style name="TextViewSinger">
+        <item name="android:textColor">@color/YP_Text_Gray</item>
+    </style>
 </resources>

@@ -18,4 +18,5 @@
     <string name="letter_text">Спасибо разработчикам и разработчицам за крутое приложение!</string>
     <string name="agreement_link">https://yandex.ru/legal/practicum_offer/</string>
     <string name="clear">clear</string>
+    <string name="album_cover">Обложка альбома</string>
 </resources>

@@ -6,5 +6,7 @@
 
         <item name="colorSecondary">@color/YP_Black</item>
         <item name="colorOnSecondary">@color/YP_White</item>
+
+        <item name="colorAccent">@color/YP_Blue</item>
     </style>
 </resources>
