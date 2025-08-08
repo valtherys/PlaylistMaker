@@ -9,4 +9,6 @@
     <dimen name="text_size_settings">16sp</dimen>
     <dimen name="padding_vertical_settings">21dp</dimen>
     <dimen name="padding_right_settings">12dp</dimen>
+
+    <dimen name="text_size_artist">11sp</dimen>
 </resources>

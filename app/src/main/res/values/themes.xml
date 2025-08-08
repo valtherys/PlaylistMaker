@@ -6,6 +6,9 @@
 
         <item name="colorSecondary">@color/YP_Blue</item>
         <item name="colorOnSecondary">@color/YP_White</item>
+
+        <item name="colorAccent">@color/YP_Blue</item>
+        <item name="colorOnSurfaceVariant">@color/YP_Text_Gray</item>
     </style>
 
 </resources>

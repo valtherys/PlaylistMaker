@@ -32,7 +32,6 @@
             android:textAppearance="@style/YSRegular16" />
 
         <androidx.appcompat.widget.SwitchCompat
-            style="@style/SwitchCompatSettings"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_gravity="end|center_vertical" />

@@ -17,5 +17,7 @@
     <string name="letter_subject">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
     <string name="letter_text">Спасибо разработчикам и разработчицам за крутое приложение!</string>
     <string name="agreement_link">https://yandex.ru/legal/practicum_offer/</string>
-    <string name="clear">clear</string>
+    <string name="clear">очистить</string>
+    <string name="album_cover">Обложка альбома</string>
+    <string name="circle_separator">Разделитель круг</string>
 </resources>
