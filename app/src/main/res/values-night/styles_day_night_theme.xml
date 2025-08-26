@@ -16,5 +16,4 @@
     <style name="TextViewSongTitle">
         <item name="android:textColor">@color/YP_White</item>
     </style>
-
 </resources>

@@ -20,4 +20,9 @@
     <string name="clear">очистить</string>
     <string name="album_cover">Обложка альбома</string>
     <string name="circle_separator">Разделитель круг</string>
+    <string name="renew">Обновить</string>
+    <string name="nothing_found">Ничего не нашлось</string>
+    <string name="connection_failure">Не удалось установить соединение с сервером \n\n%s</string>
+    <string name="response_error">Проблемы с поиском \n\n Код ошибки: %s</string>
+    <string name="search_issues">Проблемы с поиском</string>
 </resources>
