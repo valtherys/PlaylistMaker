@@ -200,9 +200,3 @@ private fun clearButtonVisibility(s: CharSequence?): Int {
     }
 }
 
-
-//private fun loadTracks(context: Context): List<Track> {
-//    val json = context.assets.open("tracks.json").bufferedReader().use { it.readText() }
-//    val type = object : TypeToken<List<Track>>() {}.type
-//    return Gson().fromJson(json, type)
-//}
