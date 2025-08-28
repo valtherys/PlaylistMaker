@@ -17,4 +17,8 @@
         <item name="android:textColor">@color/YP_Black</item>
     </style>
 
+    <style name="ImageViewSearchIssues" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:src">@drawable/ic_nothing_found_120</item>
+    </style>
+
 </resources>

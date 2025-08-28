@@ -46,4 +46,6 @@
         <item name="android:scaleType">centerCrop</item>
     </style>
 
+    <style name="ButtonRenew" parent="Widget.MaterialComponents.Button.UnelevatedButton"/>
+
 </resources>

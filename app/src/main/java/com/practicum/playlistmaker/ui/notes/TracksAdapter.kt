@@ -1,18 +1,20 @@
-package com.practicum.playlistmaker.notes
+package com.practicum.playlistmaker.ui.notes
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.model.Track
+import com.practicum.playlistmaker.data.model.Track
 import com.practicum.playlistmaker.utils.dpToPx
 
 class TracksAdapter(private val tracks: List<Track>) :
-    RecyclerView.Adapter<TracksAdapter.TrackViewHolder>() {
+    ListAdapter<Track, TracksAdapter.TrackViewHolder>(TrackDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
         return TrackViewHolder(parent)
@@ -46,6 +48,25 @@ class TracksAdapter(private val tracks: List<Track>) :
                 .load(albumCoverURL)
                 .placeholder(R.drawable.ic_placeholder_45)
                 .transform(RoundedCorners(albumCornerRadiusPx)).into(albumCoverView)
+        }
+    }
+
+    class TrackDiffCallback : DiffUtil.ItemCallback<Track>() {
+        override fun areItemsTheSame(
+            oldItem: Track,
+            newItem: Track
+        ): Boolean {
+            return (oldItem.trackName == newItem.trackName)
+                    && (oldItem.artistName == newItem.artistName)
+                    && (oldItem.artworkUrl100 == newItem.artworkUrl100)
+                    && (oldItem.trackTime == newItem.trackTime)
+        }
+
+        override fun areContentsTheSame(
+            oldItem: Track,
+            newItem: Track
+        ): Boolean {
+            return oldItem == newItem
         }
     }
 }
