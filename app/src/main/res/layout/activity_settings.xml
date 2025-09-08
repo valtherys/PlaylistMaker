@@ -26,16 +26,13 @@
         android:paddingBottom="11dp"
         tools:ignore="RtlHardcoded">
 
-        <TextView
-            style="@style/TextViewSettings"
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/themeSwitcher"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
             android:text="@string/dark_theme"
             android:textAppearance="@style/YSRegular16" />
-
-        <androidx.appcompat.widget.SwitchCompat
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_gravity="end|center_vertical" />
-
     </FrameLayout>
 
     <FrameLayout

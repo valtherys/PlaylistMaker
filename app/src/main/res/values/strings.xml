@@ -25,4 +25,6 @@
     <string name="connection_failure">Не удалось установить соединение с сервером \n\n%s</string>
     <string name="response_error">Проблемы с поиском \n\n Код ошибки: %s</string>
     <string name="search_issues">Проблемы с поиском</string>
+    <string name="you_searched">Вы искали</string>
+    <string name="clear_history">Очистить историю</string>
 </resources>
