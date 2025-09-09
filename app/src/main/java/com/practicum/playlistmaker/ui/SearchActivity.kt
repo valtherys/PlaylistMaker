@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.ui
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -23,7 +24,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import androidx.core.view.isGone
-
+import com.practicum.playlistmaker.App.Companion.SHARED_PREFS_FILE
+import com.practicum.playlistmaker.data.storage.SearchHistory
 
 class SearchActivity : AppCompatActivity() {
     private var query: String = QUERY_DEF
@@ -34,7 +36,12 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var serverResponseTextView: TextView
     private lateinit var renewButton: Button
     private val tracks = ArrayList<Track>()
-    val tracksAdapter = TracksAdapter(tracks)
+
+    private lateinit var searchHistory: SearchHistory
+    private lateinit var youSearchedTextView: TextView
+    private lateinit var clearHistoryButton: Button
+    private lateinit var tracksAdapter: TracksAdapter
+    private lateinit var sharedPrefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,8 +54,16 @@ class SearchActivity : AppCompatActivity() {
         serverResponseTextView = findViewById(R.id.tv_server_response)
         renewButton = findViewById(R.id.btn_renew)
         inputEditText = findViewById(R.id.et_search)
-
-        serverResponsePlaceholder.visibility = View.GONE
+        youSearchedTextView = findViewById(R.id.tv_you_searched)
+        clearHistoryButton = findViewById(R.id.btn_clear_history)
+        sharedPrefs =
+            getSharedPreferences(SHARED_PREFS_FILE, MODE_PRIVATE)
+        searchHistory = SearchHistory(sharedPrefs)
+        searchHistory.readTracksHistory()
+        tracksAdapter = TracksAdapter { track ->
+            searchHistory.addTrackInTracksHistory(track)
+            searchHistory.saveTracksHistory()
+        }
 
         val inputMethodManager =
             getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
@@ -64,8 +79,6 @@ class SearchActivity : AppCompatActivity() {
 
         clearBtn.setOnClickListener {
             inputEditText.setText("")
-            tracks.clear()
-            tracksAdapter.submitList(ArrayList(tracks))
             hideSearchState()
         }
 
@@ -88,6 +101,19 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
+        inputEditText.setOnFocusChangeListener { view, hasFocus ->
+            if (hasFocus && inputEditText.text.isBlank() && (searchHistory.getTracksHistoryCopy().isNotEmpty())) {
+                showTracksHistory()
+            } else {
+                hideTracksHistory()
+            }
+        }
+
+        clearHistoryButton.setOnClickListener {
+            searchHistory.clearTracksHistory()
+            hideTracksHistory()
+        }
+
         val simpleTextWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 // empty
@@ -98,6 +124,11 @@ class SearchActivity : AppCompatActivity() {
                 if (clearBtn.isGone) inputMethodManager?.hideSoftInputFromWindow(
                     inputEditText.windowToken, 0
                 )
+                if (inputEditText.hasFocus() && s?.isEmpty() == true && searchHistory.getTracksHistoryCopy().isNotEmpty()) {
+                    showTracksHistory()
+                } else {
+                    hideTracksHistory()
+                }
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -109,7 +140,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun showEmptyState() {
         tracks.clear()
-        tracksAdapter.submitList(ArrayList(tracks))
+        tracksAdapter.submitList(tracks.toList())
 
         serverResponseImagePlaceholder.setImageResource(R.drawable.ic_nothing_found_120)
         serverResponseTextView.text = getString(R.string.nothing_found)
@@ -122,7 +153,7 @@ class SearchActivity : AppCompatActivity() {
         isConnectionError: Boolean
     ) {
         tracks.clear()
-        tracksAdapter.submitList(ArrayList(tracks))
+        tracksAdapter.submitList(tracks.toList())
 
         serverResponseImagePlaceholder.setImageResource(R.drawable.ic_network_issues_120)
         serverResponseTextView.text =
@@ -153,7 +184,7 @@ class SearchActivity : AppCompatActivity() {
                         tracks.clear()
                         if (response.body()?.results?.isNotEmpty() == true) {
                             tracks.addAll(response.body()?.results ?: arrayListOf())
-                            tracksAdapter.submitList(ArrayList(tracks))
+                            tracksAdapter.submitList(tracks.toList())
                         }
                         if (tracks.isEmpty()) {
                             showEmptyState()
@@ -184,6 +215,21 @@ class SearchActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
         query = savedInstanceState.getString(QUERY, QUERY_DEF)
         inputEditText.setText(query)
+    }
+
+    private fun showTracksHistory() {
+        tracks.clear()
+        tracks.addAll(searchHistory.getTracksHistoryCopy().reversed())
+        tracksAdapter.submitList(tracks.toList())
+        youSearchedTextView.visibility = View.VISIBLE
+        clearHistoryButton.visibility = View.VISIBLE
+    }
+
+    private fun hideTracksHistory() {
+        tracks.clear()
+        tracksAdapter.submitList(tracks.toList())
+        youSearchedTextView.visibility = View.GONE
+        clearHistoryButton.visibility = View.GONE
     }
 
     companion object {

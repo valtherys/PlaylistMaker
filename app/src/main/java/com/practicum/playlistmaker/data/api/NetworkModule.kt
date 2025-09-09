@@ -11,5 +11,5 @@ object NetworkModule {
         GsonConverterFactory.create()
     ).build()
 
-    val iTunesService = retrofit.create(ITunesAPI::class.java)
+    val iTunesService: ITunesAPI = retrofit.create(ITunesAPI::class.java)
 }

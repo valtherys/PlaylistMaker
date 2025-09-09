@@ -13,19 +13,20 @@ import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.data.model.Track
 import com.practicum.playlistmaker.utils.dpToPx
 
-class TracksAdapter(private val tracks: List<Track>) :
+class TracksAdapter(private val onItemClick: (Track) -> Unit) :
     ListAdapter<Track, TracksAdapter.TrackViewHolder>(TrackDiffCallback()) {
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
         return TrackViewHolder(parent)
     }
 
-    override fun getItemCount(): Int {
-        return tracks.size
-    }
-
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
-        holder.bind(tracks[position])
+        val track = getItem(position)
+        holder.bind(track)
+        holder.itemView.setOnClickListener {
+            onItemClick(track)
+        }
     }
 
     class TrackViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
@@ -56,10 +57,7 @@ class TracksAdapter(private val tracks: List<Track>) :
             oldItem: Track,
             newItem: Track
         ): Boolean {
-            return (oldItem.trackName == newItem.trackName)
-                    && (oldItem.artistName == newItem.artistName)
-                    && (oldItem.artworkUrl100 == newItem.artworkUrl100)
-                    && (oldItem.trackTime == newItem.trackTime)
+            return oldItem.trackId == newItem.trackId
         }
 
         override fun areContentsTheSame(

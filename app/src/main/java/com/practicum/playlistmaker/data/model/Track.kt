@@ -10,5 +10,6 @@ data class Track(
     @SerializedName("trackTimeMillis")
     @JsonAdapter(TrackTimeAdapter::class)
     val trackTime: String,
-    val artworkUrl100: String
+    val artworkUrl100: String,
+    val trackId: String
 )
