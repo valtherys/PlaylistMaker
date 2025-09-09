@@ -102,7 +102,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         inputEditText.setOnFocusChangeListener { view, hasFocus ->
-            if (hasFocus && inputEditText.text.isBlank() && (searchHistory.tracksHistory.isNotEmpty())) {
+            if (hasFocus && inputEditText.text.isBlank() && (searchHistory.getTracksHistoryCopy().isNotEmpty())) {
                 showTracksHistory()
             } else {
                 hideTracksHistory()
@@ -124,7 +124,7 @@ class SearchActivity : AppCompatActivity() {
                 if (clearBtn.isGone) inputMethodManager?.hideSoftInputFromWindow(
                     inputEditText.windowToken, 0
                 )
-                if (inputEditText.hasFocus() && s?.isEmpty() == true && searchHistory.tracksHistory.isNotEmpty()) {
+                if (inputEditText.hasFocus() && s?.isEmpty() == true && searchHistory.getTracksHistoryCopy().isNotEmpty()) {
                     showTracksHistory()
                 } else {
                     hideTracksHistory()
@@ -219,7 +219,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun showTracksHistory() {
         tracks.clear()
-        tracks.addAll(searchHistory.tracksHistory.reversed())
+        tracks.addAll(searchHistory.getTracksHistoryCopy().reversed())
         tracksAdapter.submitList(tracks.toList())
         youSearchedTextView.visibility = View.VISIBLE
         clearHistoryButton.visibility = View.VISIBLE

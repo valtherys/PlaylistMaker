@@ -5,88 +5,95 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorPrimary"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/btn_back"
-        style="@style/TextViewTitle"
-        android:text="@string/search"
-        android:textAppearance="@style/YSMedium22"
-        app:drawableStartCompat="@drawable/ic_back_arrow_24" />
-
-    <FrameLayout
-        style="@style/FrameLayoutSearch"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:layout_marginBottom="16dp"
-        android:paddingHorizontal="13dp">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <EditText
-            android:id="@+id/et_search"
-            style="@style/EditTextSearch"
+        <TextView
+            android:id="@+id/btn_back"
+            style="@style/TextViewTitle"
+            android:text="@string/search"
+            android:textAppearance="@style/YSMedium22"
+            app:drawableStartCompat="@drawable/ic_back_arrow_24" />
+
+        <FrameLayout
+            style="@style/FrameLayoutSearch"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="27dp"
-            android:autofillHints="no"
-            android:background="@android:color/transparent"
-            android:hint="@string/search"
-            android:imeOptions="actionDone"
-            android:inputType="text"
-            android:lines="1"
-            android:maxLength="60"
-            android:singleLine="true"
-            android:textAppearance="@style/YSRegular16"
-            android:textColor="@color/YP_Black" />
+            android:layout_height="36dp"
+            android:layout_marginBottom="16dp"
+            android:paddingHorizontal="13dp">
 
-        <ImageView
-            style="@style/IconSearch"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_gravity="center_vertical"
-            android:contentDescription="@string/search"
-            android:src="@drawable/ic_search_24" />
+            <EditText
+                android:id="@+id/et_search"
+                style="@style/EditTextSearch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="27dp"
+                android:autofillHints="no"
+                android:background="@android:color/transparent"
+                android:hint="@string/search"
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:lines="1"
+                android:maxLength="60"
+                android:singleLine="true"
+                android:textAppearance="@style/YSRegular16"
+                android:textColor="@color/YP_Black" />
 
-        <ImageView
-            android:id="@+id/iv_clear"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_gravity="center_vertical|end"
-            android:contentDescription="@string/clear"
-            android:src="@drawable/ic_close_24"
+            <ImageView
+                style="@style/IconSearch"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center_vertical"
+                android:contentDescription="@string/search"
+                android:src="@drawable/ic_search_24" />
+
+            <ImageView
+                android:id="@+id/iv_clear"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center_vertical|end"
+                android:contentDescription="@string/clear"
+                android:src="@drawable/ic_close_24"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tv_you_searched"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:text="@string/you_searched"
+            android:textAppearance="@style/YSMedium19"
+            android:textColor="?attr/colorOnPrimary"
+            android:textFontWeight="500"
             android:visibility="gone" />
 
-    </FrameLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
-    <TextView
-        android:id="@+id/tv_you_searched"
-        android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp"
-        android:gravity="center"
-        android:text="@string/you_searched"
-        android:textAppearance="@style/YSMedium19"
-        android:textColor="?attr/colorOnPrimary"
-        android:textFontWeight="500"
-        android:visibility="gone" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <Button
-        android:id="@+id/btn_clear_history"
-        style="@style/ButtonSearchScreen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="24dp"
-        android:text="@string/clear_history"
-        android:textAppearance="@style/YSMedium14"
-        android:visibility="gone" />
+        <Button
+            android:id="@+id/btn_clear_history"
+            style="@style/ButtonSearchScreen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="24dp"
+            android:text="@string/clear_history"
+            android:textAppearance="@style/YSMedium14"
+            android:visibility="gone" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/ll_placeholder"
@@ -122,6 +129,5 @@
             android:text="@string/renew"
             android:textAppearance="@style/YSMedium14" />
     </LinearLayout>
-
 
 </LinearLayout>
