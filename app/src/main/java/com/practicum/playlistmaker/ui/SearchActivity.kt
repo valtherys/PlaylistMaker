@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.ui
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
@@ -12,6 +13,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,6 +28,7 @@ import retrofit2.Response
 import androidx.core.view.isGone
 import com.practicum.playlistmaker.App.Companion.SHARED_PREFS_FILE
 import com.practicum.playlistmaker.data.storage.SearchHistory
+import com.practicum.playlistmaker.utils.applySystemBarsPadding
 
 class SearchActivity : AppCompatActivity() {
     private var query: String = QUERY_DEF
@@ -45,7 +48,10 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.activity_search)
+        val root = findViewById<LinearLayout>(R.id.main)
+        root.applySystemBarsPadding()
 
         val backBtn = findViewById<TextView>(R.id.btn_back)
         val clearBtn = findViewById<ImageView>(R.id.iv_clear)
@@ -61,6 +67,10 @@ class SearchActivity : AppCompatActivity() {
         searchHistory = SearchHistory(sharedPrefs)
         searchHistory.readTracksHistory()
         tracksAdapter = TracksAdapter { track ->
+            val displayIntent = Intent(this, AudioPlayerActivity::class.java)
+            displayIntent.putExtra(AudioPlayerActivity.INTENT_EXTRA_KEY, track)
+            startActivity(displayIntent)
+
             searchHistory.addTrackInTracksHistory(track)
             searchHistory.saveTracksHistory()
         }
@@ -102,7 +112,9 @@ class SearchActivity : AppCompatActivity() {
         }
 
         inputEditText.setOnFocusChangeListener { view, hasFocus ->
-            if (hasFocus && inputEditText.text.isBlank() && (searchHistory.getTracksHistoryCopy().isNotEmpty())) {
+            if (hasFocus && inputEditText.text.isBlank() && (searchHistory.getTracksHistoryCopy()
+                    .isNotEmpty())
+            ) {
                 showTracksHistory()
             } else {
                 hideTracksHistory()
@@ -124,7 +136,9 @@ class SearchActivity : AppCompatActivity() {
                 if (clearBtn.isGone) inputMethodManager?.hideSoftInputFromWindow(
                     inputEditText.windowToken, 0
                 )
-                if (inputEditText.hasFocus() && s?.isEmpty() == true && searchHistory.getTracksHistoryCopy().isNotEmpty()) {
+                if (inputEditText.hasFocus() && s?.isEmpty() == true && searchHistory.getTracksHistoryCopy()
+                        .isNotEmpty()
+                ) {
                     showTracksHistory()
                 } else {
                     hideTracksHistory()
