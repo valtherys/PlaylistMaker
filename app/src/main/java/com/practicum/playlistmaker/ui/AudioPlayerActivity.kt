@@ -15,6 +15,7 @@ import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.data.model.Track
 import com.practicum.playlistmaker.utils.applySystemBarsPadding
 import com.practicum.playlistmaker.utils.dpToPx
+import androidx.constraintlayout.widget.Group
 
 class AudioPlayerActivity : AppCompatActivity() {
     private lateinit var btnBack: ImageButton
@@ -26,11 +27,11 @@ class AudioPlayerActivity : AppCompatActivity() {
     private lateinit var trackReleaseYear: TextView
     private lateinit var trackGenre: TextView
     private lateinit var trackCountry: TextView
-    private lateinit var albumGroup: androidx.constraintlayout.widget.Group
-    private lateinit var yearGroup: androidx.constraintlayout.widget.Group
+    private lateinit var albumGroup: Group
+    private lateinit var yearGroup: Group
     private var track: Track? = null
 
-    private val albumCornerRadiusDp: Float = 8f
+    private val albumCornerRadiusDp: Float = ALBUM_CORNER_RADIUS_DP.toFloat()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,10 +40,9 @@ class AudioPlayerActivity : AppCompatActivity() {
         val root = findViewById<ConstraintLayout>(R.id.main)
         root.applySystemBarsPadding()
 
-        track =
-            savedInstanceState?.getParcelable(INTENT_EXTRA_KEY) ?: intent.getParcelableExtra(
-                INTENT_EXTRA_KEY
-            )
+        track = intent.getParcelableExtra(
+            INTENT_EXTRA_KEY
+        )
         if (track == null) {
             Log.e(ACTIVITY_TAG, "No track passed to activity")
             finish()
@@ -66,11 +66,6 @@ class AudioPlayerActivity : AppCompatActivity() {
         btnBack.setOnClickListener { finish() }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putParcelable(INTENT_EXTRA_KEY, track)
-    }
-
     private fun bindData(track: Track, cornerRadiusPx: Int) {
         val albumCoverHighResolution = track.getArtworkUrlHighResolution()
         Glide.with(this)
@@ -90,7 +85,7 @@ class AudioPlayerActivity : AppCompatActivity() {
 
     private fun hideViewGroupIfEmpty(
         field: String?,
-        viewGroup: androidx.constraintlayout.widget.Group,
+        viewGroup: Group,
         dataField: TextView
     ) {
         if (field.isNullOrEmpty()) {
@@ -104,5 +99,6 @@ class AudioPlayerActivity : AppCompatActivity() {
     companion object {
         const val INTENT_EXTRA_KEY = "TRACK"
         private const val ACTIVITY_TAG = "AudioPlayerActivity"
+        private const val ALBUM_CORNER_RADIUS_DP = "8f"
     }
 }

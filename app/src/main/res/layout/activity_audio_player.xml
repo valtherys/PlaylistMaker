@@ -45,6 +45,7 @@
         app:layout_constraintEnd_toStartOf="@id/guideline_right"
         app:layout_constraintStart_toEndOf="@id/guideline_left"
         app:layout_constraintTop_toBottomOf="@id/btn_back"
+        app:layout_constraintBottom_toTopOf="@id/tv_track_name"
         tools:srcCompat="@drawable/ic_placeholder_45" />
 
     <TextView
@@ -138,7 +139,7 @@
         android:layout_marginTop="30dp"
         android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_timer" />
+        app:layout_constraintTop_toBottomOf="@id/tv_timer"/>
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier_track_data"
