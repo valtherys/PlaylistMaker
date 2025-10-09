@@ -41,11 +41,11 @@
         android:layout_marginTop="30dp"
         android:contentDescription="@string/album_cover"
         android:scaleType="centerCrop"
+        app:layout_constraintBottom_toTopOf="@id/tv_track_name"
         app:layout_constraintDimensionRatio="h,1:1"
         app:layout_constraintEnd_toStartOf="@id/guideline_right"
         app:layout_constraintStart_toEndOf="@id/guideline_left"
         app:layout_constraintTop_toBottomOf="@id/btn_back"
-        app:layout_constraintBottom_toTopOf="@id/tv_track_name"
         tools:srcCompat="@drawable/ic_placeholder_45" />
 
     <TextView
@@ -119,17 +119,28 @@
         app:srcCompat="@drawable/ic_add_to_favorites_51" />
 
     <TextView
-        android:id="@+id/tv_timer"
+        android:id="@+id/tv_timer_anchor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
+        android:text="@string/timer_anchor_text"
+        android:textAppearance="@style/YSMedium14"
+        android:letterSpacing="0.05"
+        android:textColor="@android:color/transparent"
+        app:layout_constraintLeft_toRightOf="@id/guideline_left"
+        app:layout_constraintRight_toLeftOf="@id/guideline_right"
+        app:layout_constraintTop_toBottomOf="@id/btn_play" />
+
+    <TextView
+        android:id="@+id/tv_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="@string/count_start"
         android:textAppearance="@style/YSMedium14"
+        android:letterSpacing="0.05"
         android:textColor="?attr/colorOnPrimary"
-        app:layout_constraintEnd_toStartOf="@id/guideline_right"
-        app:layout_constraintStart_toEndOf="@id/guideline_left"
-        app:layout_constraintTop_toBottomOf="@id/btn_play"
-        app:layout_constraintWidth_max="100dp" />
+        app:layout_constraintLeft_toLeftOf="@id/tv_timer_anchor"
+        app:layout_constraintTop_toTopOf="@id/tv_timer_anchor" />
 
     <View
         android:id="@+id/view_track_data"
@@ -139,7 +150,7 @@
         android:layout_marginTop="30dp"
         android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_timer"/>
+        app:layout_constraintTop_toBottomOf="@id/tv_timer" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier_track_data"

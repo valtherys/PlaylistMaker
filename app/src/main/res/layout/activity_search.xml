@@ -65,44 +65,60 @@
 
         </FrameLayout>
 
-        <TextView
-            android:id="@+id/tv_you_searched"
+        <LinearLayout
+            android:id="@+id/recycler_view_wrapper"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"
-            android:gravity="center"
-            android:text="@string/you_searched"
-            android:textAppearance="@style/YSMedium19"
-            android:textColor="?attr/colorOnPrimary"
-            android:textFontWeight="500"
-            android:visibility="gone" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <Button
-            android:id="@+id/btn_clear_history"
-            style="@style/ButtonSearchScreen"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/tv_you_searched"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:gravity="center"
+                android:text="@string/you_searched"
+                android:textAppearance="@style/YSMedium19"
+                android:textColor="?attr/colorOnPrimary"
+                android:textFontWeight="500"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/btn_clear_history"
+                style="@style/ButtonSearchScreen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="24dp"
+                android:text="@string/clear_history"
+                android:textAppearance="@style/YSMedium14"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             android:layout_gravity="center"
-            android:layout_marginTop="24dp"
-            android:text="@string/clear_history"
-            android:textAppearance="@style/YSMedium14"
+            android:layout_marginTop="140dp"
+            android:indeterminateTint="@color/YP_Blue"
             android:visibility="gone" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/ll_placeholder"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="102dp"
+        android:visibility="gone"
         android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone">
+        android:orientation="vertical">
 
         <ImageView
             android:id="@+id/iv_placeholder"
