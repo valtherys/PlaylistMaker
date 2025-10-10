@@ -26,21 +26,24 @@ class AudioPlayerActivity : AppCompatActivity() {
     private val albumCornerRadiusDp: Float = ALBUM_CORNER_RADIUS_DP
     private val mediaPlayer = MediaPlayer()
     private var playerState = STATE_DEFAULT
-    private var mainThreadHandler: Handler? = null
+    private var mainThreadHandler = Handler(Looper.getMainLooper())
+    private val dateFormat by lazy {
+        SimpleDateFormat(
+            "mm:ss",
+            Locale.getDefault()
+        )
+    }
     private var lastCurrentPosition = LAST_CURRENT_POSITION_DEFAULT
 
     private val updateTimerTask = object : Runnable {
         override fun run() {
             val currentPosition = mediaPlayer.currentPosition
             if (currentPosition != lastCurrentPosition) {
-                binding.tvTimer.text = SimpleDateFormat(
-                    "mm:ss",
-                    Locale.getDefault()
-                ).format(currentPosition)
+                binding.tvTimer.text = dateFormat.format(currentPosition)
                 lastCurrentPosition = currentPosition
             }
             if (playerState == STATE_PLAYING && mediaPlayer.isPlaying) {
-                mainThreadHandler?.postDelayed(this, TIMER_UPDATE_DELAY)
+                mainThreadHandler.postDelayed(this, TIMER_UPDATE_DELAY)
             }
         }
     }
@@ -51,7 +54,6 @@ class AudioPlayerActivity : AppCompatActivity() {
         binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.root.applySystemBarsPadding()
-        mainThreadHandler = Handler(Looper.getMainLooper())
 
         track = intent.getParcelableExtra(
             INTENT_EXTRA_KEY
@@ -80,7 +82,7 @@ class AudioPlayerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        mainThreadHandler?.removeCallbacksAndMessages(null)
+        mainThreadHandler.removeCallbacksAndMessages(null)
         mediaPlayer.release()
     }
 
@@ -120,7 +122,7 @@ class AudioPlayerActivity : AppCompatActivity() {
             playerState = STATE_PREPARED
         }
         mediaPlayer.setOnCompletionListener {
-            mainThreadHandler?.removeCallbacks(updateTimerTask)
+            mainThreadHandler.removeCallbacks(updateTimerTask)
             binding.btnPlay.setImageResource(R.drawable.ic_play_100)
             binding.tvTimer.text = getString(R.string.count_start)
             playerState = STATE_PREPARED
@@ -134,7 +136,7 @@ class AudioPlayerActivity : AppCompatActivity() {
     private fun startPlayer() {
         mediaPlayer.start()
         lastCurrentPosition = LAST_CURRENT_POSITION_DEFAULT
-        mainThreadHandler?.post(updateTimerTask)
+        mainThreadHandler.post(updateTimerTask)
         binding.btnPlay.setImageResource(R.drawable.ic_pause_100)
         playerState = STATE_PLAYING
     }
@@ -142,7 +144,7 @@ class AudioPlayerActivity : AppCompatActivity() {
     private fun pausePlayer() {
         if (mediaPlayer.isPlaying) {
             mediaPlayer.pause()
-            mainThreadHandler?.removeCallbacks(updateTimerTask)
+            mainThreadHandler.removeCallbacks(updateTimerTask)
             binding.btnPlay.setImageResource(R.drawable.ic_play_100)
             playerState = STATE_PAUSED
         }

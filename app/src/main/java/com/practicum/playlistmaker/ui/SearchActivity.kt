@@ -8,7 +8,6 @@ import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -36,7 +35,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var tracksAdapter: TracksAdapter
     private lateinit var sharedPrefs: SharedPreferences
     private var isClickAllowed = true
-    private var mainThreadHandler: Handler? = null
+    private var mainThreadHandler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { searchTracks() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +44,6 @@ class SearchActivity : AppCompatActivity() {
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.root.applySystemBarsPadding()
-        mainThreadHandler = Handler(Looper.getMainLooper())
 
         sharedPrefs = getSharedPreferences(SHARED_PREFS_FILE, MODE_PRIVATE)
         searchHistory = SearchHistory(sharedPrefs)
@@ -123,6 +121,11 @@ class SearchActivity : AppCompatActivity() {
             }
         }
         binding.etSearch.addTextChangedListener(simpleTextWatcher)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mainThreadHandler.removeCallbacks(searchRunnable)
     }
 
     private fun showEmptyState() {
@@ -222,15 +225,15 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun searchDebounce() {
-        mainThreadHandler?.removeCallbacks(searchRunnable)
-        mainThreadHandler?.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+        mainThreadHandler.removeCallbacks(searchRunnable)
+        mainThreadHandler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
     }
 
     private fun clickDebounce(): Boolean {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
-            mainThreadHandler?.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+            mainThreadHandler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
         }
         return current
     }
