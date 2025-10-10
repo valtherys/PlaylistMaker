@@ -1,14 +1,14 @@
 package com.practicum.playlistmaker.ui
 
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
-import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
@@ -16,29 +16,44 @@ import com.practicum.playlistmaker.data.model.Track
 import com.practicum.playlistmaker.utils.applySystemBarsPadding
 import com.practicum.playlistmaker.utils.dpToPx
 import androidx.constraintlayout.widget.Group
+import com.practicum.playlistmaker.databinding.ActivityAudioPlayerBinding
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class AudioPlayerActivity : AppCompatActivity() {
-    private lateinit var btnBack: ImageButton
-    private lateinit var albumCover: ImageView
-    private lateinit var trackName: TextView
-    private lateinit var trackArtist: TextView
-    private lateinit var trackDuration: TextView
-    private lateinit var trackAlbum: TextView
-    private lateinit var trackReleaseYear: TextView
-    private lateinit var trackGenre: TextView
-    private lateinit var trackCountry: TextView
-    private lateinit var albumGroup: Group
-    private lateinit var yearGroup: Group
+    private lateinit var binding: ActivityAudioPlayerBinding
     private var track: Track? = null
+    private val albumCornerRadiusDp: Float = ALBUM_CORNER_RADIUS_DP
+    private val mediaPlayer = MediaPlayer()
+    private var playerState = STATE_DEFAULT
+    private var mainThreadHandler = Handler(Looper.getMainLooper())
+    private val dateFormat by lazy {
+        SimpleDateFormat(
+            "mm:ss",
+            Locale.getDefault()
+        )
+    }
+    private var lastCurrentPosition = LAST_CURRENT_POSITION_DEFAULT
 
-    private val albumCornerRadiusDp: Float = ALBUM_CORNER_RADIUS_DP.toFloat()
+    private val updateTimerTask = object : Runnable {
+        override fun run() {
+            val currentPosition = mediaPlayer.currentPosition
+            if (currentPosition != lastCurrentPosition) {
+                binding.tvTimer.text = dateFormat.format(currentPosition)
+                lastCurrentPosition = currentPosition
+            }
+            if (playerState == STATE_PLAYING && mediaPlayer.isPlaying) {
+                mainThreadHandler.postDelayed(this, TIMER_UPDATE_DELAY)
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_audio_player)
-        val root = findViewById<ConstraintLayout>(R.id.main)
-        root.applySystemBarsPadding()
+        binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.root.applySystemBarsPadding()
 
         track = intent.getParcelableExtra(
             INTENT_EXTRA_KEY
@@ -48,22 +63,27 @@ class AudioPlayerActivity : AppCompatActivity() {
             finish()
             return
         }
-        btnBack = findViewById(R.id.btn_back)
-        albumCover = findViewById(R.id.iv_album_cover)
-        trackName = findViewById(R.id.tv_track_name)
-        trackArtist = findViewById(R.id.tv_track_artist)
-        trackDuration = findViewById(R.id.tv_duration_data)
-        trackAlbum = findViewById(R.id.tv_album_data)
-        trackReleaseYear = findViewById(R.id.tv_year_data)
-        trackGenre = findViewById(R.id.tv_genre_data)
-        trackCountry = findViewById(R.id.tv_country_data)
-        albumGroup = findViewById(R.id.group_album)
-        yearGroup = findViewById(R.id.group_year)
 
         val albumCornerRadiusPx = dpToPx(albumCornerRadiusDp)
 
+        binding.btnPlay.isEnabled = false
+        preparePlayer()
         bindData(track!!, albumCornerRadiusPx)
-        btnBack.setOnClickListener { finish() }
+        binding.btnPlay.setOnClickListener {
+            playbackControl()
+        }
+        binding.btnBack.setOnClickListener { finish() }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        pausePlayer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mainThreadHandler.removeCallbacksAndMessages(null)
+        mediaPlayer.release()
     }
 
     private fun bindData(track: Track, cornerRadiusPx: Int) {
@@ -71,16 +91,16 @@ class AudioPlayerActivity : AppCompatActivity() {
         Glide.with(this)
             .load(albumCoverHighResolution)
             .placeholder(R.drawable.ic_placeholder_45)
-            .transform(RoundedCorners(cornerRadiusPx)).into(albumCover)
+            .transform(RoundedCorners(cornerRadiusPx)).into(binding.ivAlbumCover)
 
-        trackName.text = track.trackName
-        trackArtist.text = track.artistName
-        trackDuration.text = track.trackTime
-        trackGenre.text = track.primaryGenreName
-        trackCountry.text = track.country
+        binding.tvTrackName.text = track.trackName
+        binding.tvTrackArtist.text = track.artistName
+        binding.tvDurationData.text = track.trackTime
+        binding.tvGenreData.text = track.primaryGenreName
+        binding.tvCountryData.text = track.country
 
-        hideViewGroupIfEmpty(track.collectionName, albumGroup, trackAlbum)
-        hideViewGroupIfEmpty(track.getReleaseYear(), yearGroup, trackReleaseYear)
+        hideViewGroupIfEmpty(track.collectionName, binding.groupAlbum, binding.tvAlbumData)
+        hideViewGroupIfEmpty(track.getReleaseYear(), binding.groupYear, binding.tvYearData)
     }
 
     private fun hideViewGroupIfEmpty(
@@ -96,9 +116,62 @@ class AudioPlayerActivity : AppCompatActivity() {
         }
     }
 
+    private fun preparePlayer() {
+        mediaPlayer.setOnPreparedListener {
+            binding.btnPlay.isEnabled = true
+            playerState = STATE_PREPARED
+        }
+        mediaPlayer.setOnCompletionListener {
+            mainThreadHandler.removeCallbacks(updateTimerTask)
+            binding.btnPlay.setImageResource(R.drawable.ic_play_100)
+            binding.tvTimer.text = getString(R.string.count_start)
+            playerState = STATE_PREPARED
+            lastCurrentPosition = LAST_CURRENT_POSITION_DEFAULT
+        }
+
+        mediaPlayer.setDataSource(track?.previewUrl)
+        mediaPlayer.prepareAsync()
+    }
+
+    private fun startPlayer() {
+        mediaPlayer.start()
+        lastCurrentPosition = LAST_CURRENT_POSITION_DEFAULT
+        mainThreadHandler.post(updateTimerTask)
+        binding.btnPlay.setImageResource(R.drawable.ic_pause_100)
+        playerState = STATE_PLAYING
+    }
+
+    private fun pausePlayer() {
+        if (mediaPlayer.isPlaying) {
+            mediaPlayer.pause()
+            mainThreadHandler.removeCallbacks(updateTimerTask)
+            binding.btnPlay.setImageResource(R.drawable.ic_play_100)
+            playerState = STATE_PAUSED
+        }
+    }
+
+    private fun playbackControl() {
+        when (playerState) {
+            STATE_PLAYING -> {
+                pausePlayer()
+            }
+
+            STATE_PREPARED, STATE_PAUSED -> {
+                startPlayer()
+            }
+        }
+    }
+
+
     companion object {
         const val INTENT_EXTRA_KEY = "TRACK"
         private const val ACTIVITY_TAG = "AudioPlayerActivity"
-        private const val ALBUM_CORNER_RADIUS_DP = "8f"
+        private const val TIMER_UPDATE_DELAY = 300L
+        private const val LAST_CURRENT_POSITION_DEFAULT = -1
+        private const val ALBUM_CORNER_RADIUS_DP = 8f
+        private const val STATE_DEFAULT = 0
+        private const val STATE_PREPARED = 1
+        private const val STATE_PLAYING = 2
+        private const val STATE_PAUSED = 3
     }
 }
