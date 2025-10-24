@@ -116,6 +116,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="102dp"
+        android:paddingHorizontal="16dp"
         android:visibility="gone"
         android:gravity="center"
         android:orientation="vertical">
