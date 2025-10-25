@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker.domain.impl
 
 
+import android.util.Log
 import com.practicum.playlistmaker.domain.api.search.TracksSearchInteractor
 import com.practicum.playlistmaker.domain.api.search.TracksSearchRepository
 import com.practicum.playlistmaker.domain.models.TracksResponse
@@ -17,7 +18,8 @@ class TracksSearchInteractorImpl(private val repository: TracksSearchRepository)
             try {
                 consumer.consume(repository.searchTracks(expression))
             } catch (e: Exception) {
-                consumer.consume(TracksResponse(CONNECTION_ERROR_CODE, ArrayList(), ResultType.CONNECTION))
+                Log.e("error interactor", "$e")
+                consumer.consume(TracksResponse(CONNECTION_ERROR_CODE, listOf(), ResultType.CONNECTION))
             }
 
         }

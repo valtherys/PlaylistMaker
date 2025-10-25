@@ -16,7 +16,7 @@ class TracksSearchRepositoryImpl(private val networkClient: NetworkClient) :
         return if (response.resultCode.isRequestSuccessful()) {
             val tracksRow = (response as TracksSearchResponse).results
             if (tracksRow.isEmpty()){
-                TracksResponse(response.resultCode, ArrayList(), ResultType.EMPTY)
+                TracksResponse(response.resultCode, listOf(), ResultType.EMPTY)
             } else {
                 val tracks = tracksRow.map {
                     Track(
@@ -31,12 +31,12 @@ class TracksSearchRepositoryImpl(private val networkClient: NetworkClient) :
                         country = it.country,
                         previewUrl = it.previewUrl
                     )
-                } as ArrayList<Track>
+                }
                 TracksResponse(response.resultCode, tracks, ResultType.SUCCESS)
             }
 
         } else {
-            TracksResponse(response.resultCode, ArrayList(), ResultType.ERROR)
+            TracksResponse(response.resultCode, listOf(), ResultType.ERROR)
         }
     }
 

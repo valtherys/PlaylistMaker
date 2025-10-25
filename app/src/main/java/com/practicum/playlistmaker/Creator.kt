@@ -1,5 +1,7 @@
 package com.practicum.playlistmaker
 
+import android.content.Context
+import android.content.SharedPreferences
 import com.practicum.playlistmaker.data.player.AudioPlayer
 import com.practicum.playlistmaker.data.player.AudioPlayerRepositoryImpl
 import com.practicum.playlistmaker.data.history.SearchHistory
@@ -26,6 +28,17 @@ import com.practicum.playlistmaker.presentation.search.TracksSearchPresenter
 import com.practicum.playlistmaker.presentation.settings.UserSettingsPresenter
 
 object Creator {
+    private lateinit var appContext: Context
+    private const val SHARED_PREFS_FILE = "playlist_maker"
+
+    val sharedPrefs: SharedPreferences by lazy {
+        appContext.getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)
+    }
+
+    fun init(context: Context) {
+        appContext = context.applicationContext
+    }
+
     private fun getTracksRepository(): TracksSearchRepository {
         return TracksSearchRepositoryImpl(RetrofitNetworkClient())
     }
@@ -39,26 +52,27 @@ object Creator {
     }
 
     private fun getTracksHistoryRepository(): TracksHistoryRepository {
-        return TracksHistoryRepositoryImpl(SearchHistory(App.sharedPrefs))
+        return TracksHistoryRepositoryImpl(SearchHistory(sharedPrefs))
     }
 
     fun getTracksHistoryInteractor(): TracksHistoryInteractor {
         return TracksHistoryInteractorImpl(getTracksHistoryRepository())
     }
 
-    fun provideTracksHistoryPresenter(): TracksHistoryPresenter{
+    fun provideTracksHistoryPresenter(): TracksHistoryPresenter {
         return TracksHistoryPresenter(getTracksHistoryInteractor())
     }
 
     private fun getUserSettingsRepository(): UserSettingsRepository {
-        return UserSettingsRepositoryImpl(ThemeSwitcher(App.sharedPrefs))
+        return UserSettingsRepositoryImpl(ThemeSwitcher(sharedPrefs))
     }
 
-    fun provideUserSettingsInteractor(): UserSettingsInteractor {
+    fun provideUserSettingsInteractor(): UserSettingsInteractor  {
         return UserSettingsInteractorImpl(getUserSettingsRepository())
     }
-    fun provideUserSettingsPresenter(): UserSettingsPresenter{
-        return UserSettingsPresenter(App.userSettingsInteractor)
+
+    fun provideUserSettingsPresenter(): UserSettingsPresenter {
+        return UserSettingsPresenter(provideUserSettingsInteractor())
     }
 
     private fun getAudioPlayerRepository(): AudioPlayerRepository {
@@ -69,8 +83,7 @@ object Creator {
         return AudioPlayerInteractorImpl(getAudioPlayerRepository())
     }
 
-    fun provideAudioPlayerPresenter(): AudioPlayerPresenter{
+    fun provideAudioPlayerPresenter(): AudioPlayerPresenter {
         return AudioPlayerPresenter(getAudioPlayerInteractor())
     }
-
 }

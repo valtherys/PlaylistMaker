@@ -12,6 +12,6 @@ interface TracksHistoryInteractor {
     fun deleteTracksHistory()
 
     interface TracksHistoryConsumer{
-        fun consume(tracks: ArrayList<Track>)
+        fun consume(tracks: List<Track>)
     }
 }

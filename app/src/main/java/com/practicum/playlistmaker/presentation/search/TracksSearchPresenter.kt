@@ -19,7 +19,7 @@ class TracksSearchPresenter(private val interactor: TracksSearchInteractor) {
     fun onSearchRequested(expression: String) {
         if (expression.isNotBlank()) {
             view?.showLoader()
-            view?.clearTracks()
+//            view?.clearTracks()
 
             interactor.searchTracks(expression, object : TracksSearchInteractor.TracksConsumer {
                 override fun consume(response: TracksResponse) {

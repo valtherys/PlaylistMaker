@@ -1,12 +1,12 @@
 package com.practicum.playlistmaker.data.history
 
-import android.util.Log
 import com.practicum.playlistmaker.data.dto.TrackDto
 import com.practicum.playlistmaker.domain.models.TracksHistory
 import com.practicum.playlistmaker.domain.api.history.TracksHistoryRepository
 import com.practicum.playlistmaker.domain.models.Track
 
-class TracksHistoryRepositoryImpl(private val searchHistory: SearchHistory) : TracksHistoryRepository {
+class TracksHistoryRepositoryImpl(private val searchHistory: SearchHistory) :
+    TracksHistoryRepository {
     override fun readTracksHistory() {
         searchHistory.readTracksHistory()
     }
@@ -27,25 +27,26 @@ class TracksHistoryRepositoryImpl(private val searchHistory: SearchHistory) : Tr
                     country = it.country,
                     previewUrl = it.previewUrl
                 )
-            } as ArrayList<Track>
+            }
             return TracksHistory(tracks)
         } catch (e: Exception) {
-            Log.e("HistoryRepo", "Failed to create Track for rawData=$tracksRow", e)
-            return TracksHistory(ArrayList())
+            return TracksHistory(listOf())
         }
     }
 
     override fun saveTrackInHistory(track: Track) {
-       val trackDto = TrackDto(trackName = track.trackName,
-           artistName = track.artistName,
-           trackTime = track.trackTime,
-           artworkUrl100 = track.artworkUrl100,
-           trackId = track.trackId,
-           collectionName = track.collectionName,
-           releaseDate = track.releaseDate,
-           primaryGenreName = track.primaryGenreName,
-           country = track.country,
-           previewUrl = track .previewUrl)
+        val trackDto = TrackDto(
+            trackName = track.trackName,
+            artistName = track.artistName,
+            trackTime = track.trackTime,
+            artworkUrl100 = track.artworkUrl100,
+            trackId = track.trackId,
+            collectionName = track.collectionName,
+            releaseDate = track.releaseDate,
+            primaryGenreName = track.primaryGenreName,
+            country = track.country,
+            previewUrl = track.previewUrl
+        )
         searchHistory.saveTrackInHistory(trackDto)
     }
 

@@ -4,6 +4,6 @@ import com.practicum.playlistmaker.presentation.player.ResultType
 
 data class TracksResponse (
     val resultCode: Int,
-    val tracks: ArrayList<Track>,
+    val tracks: List<Track>,
     val resultType: ResultType
 )

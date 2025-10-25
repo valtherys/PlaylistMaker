@@ -17,12 +17,11 @@ class TracksHistoryPresenter(private val interactor: TracksHistoryInteractor) {
 
     fun onShowTracksHistory(){
         interactor.getTracksFromHistory(object : TracksHistoryInteractor.TracksHistoryConsumer{
-            override fun consume(tracks: ArrayList<Track>) {
-                view?.clearTracks()
+            override fun consume(tracks: List<Track>) {
                 if (tracks.isEmpty()){
                     view?.hideTracksHistory()
                 } else {
-                    view?.showTracksHistory(ArrayList(tracks.reversed()))
+                    view?.showTracksHistory(tracks.reversed())
                 }
             }
         })

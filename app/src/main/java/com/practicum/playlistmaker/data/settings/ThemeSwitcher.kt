@@ -3,7 +3,7 @@ package com.practicum.playlistmaker.data.settings
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
-import com.practicum.playlistmaker.App
+import com.practicum.playlistmaker.Creator
 
 class ThemeSwitcher(private val sharedPrefs: SharedPreferences) {
     var darkTheme = false
@@ -16,7 +16,7 @@ class ThemeSwitcher(private val sharedPrefs: SharedPreferences) {
 
     fun switchTheme(darkThemeEnabled: Boolean) {
         darkTheme = darkThemeEnabled
-        App.Companion.sharedPrefs.edit { putBoolean(APP_THEME_KEY, darkThemeEnabled) }
+        Creator.sharedPrefs.edit { putBoolean(APP_THEME_KEY, darkThemeEnabled) }
 
         setTheme(darkThemeEnabled)
     }

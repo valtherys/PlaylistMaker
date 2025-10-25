@@ -9,5 +9,7 @@
 
         <item name="colorAccent">@color/YP_Blue</item>
         <item name="colorOnSurfaceVariant">@color/YP_White</item>
+
+        <item name="colorOnBackground">@color/YP_Black</item>
     </style>
 </resources>

@@ -24,7 +24,6 @@ import com.practicum.playlistmaker.utils.applySystemBarsPadding
 class SearchActivity : AppCompatActivity(), SearchView, SearchHistoryView {
     private var query: String = QUERY_DEF
     private lateinit var binding: ActivitySearchBinding
-    private val tracks = ArrayList<Track>()
     private lateinit var tracksAdapter: TracksAdapter
     private var isClickAllowed = true
     private var mainThreadHandler = Handler(Looper.getMainLooper())
@@ -52,7 +51,7 @@ class SearchActivity : AppCompatActivity(), SearchView, SearchHistoryView {
                 tracksHistoryPresenter.onSaveTrackInHistory(track)
             }
         }
-        tracksHistoryPresenter.onReadTracksHistory()
+
 
         val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
 
@@ -116,6 +115,7 @@ class SearchActivity : AppCompatActivity(), SearchView, SearchHistoryView {
         super.onStart()
         presenter.attachView(this)
         tracksHistoryPresenter.attachView(this)
+        tracksHistoryPresenter.onReadTracksHistory()
     }
 
     override fun onStop() {
@@ -144,17 +144,16 @@ class SearchActivity : AppCompatActivity(), SearchView, SearchHistoryView {
         }
     }
 
-    override fun showFoundTracks(foundTracks: ArrayList<Track>) {
+    override fun showFoundTracks(foundTracks: List<Track>) {
         runOnUiThread {
             binding.llPlaceholder.visibility = View.GONE
-            tracks.addAll(foundTracks)
-            tracksAdapter.submitList(tracks.toList())
+            tracksAdapter.submitList(foundTracks.toList())
         }
     }
 
     override fun showEmptyState() {
         runOnUiThread {
-            tracksAdapter.submitList(tracks.toList())
+            tracksAdapter.submitList(listOf())
 
             binding.ivPlaceholder.setImageResource(R.drawable.ic_nothing_found_120)
             binding.tvServerResponse.text = getString(R.string.nothing_found)
@@ -167,7 +166,7 @@ class SearchActivity : AppCompatActivity(), SearchView, SearchHistoryView {
         errorMessage: String, isConnectionError: Boolean
     ) {
         runOnUiThread {
-            tracksAdapter.submitList(tracks.toList())
+            tracksAdapter.submitList(listOf())
 
             binding.ivPlaceholder.setImageResource(R.drawable.ic_network_issues_120)
             binding.tvServerResponse.text = if (isConnectionError) {
@@ -181,24 +180,18 @@ class SearchActivity : AppCompatActivity(), SearchView, SearchHistoryView {
         }
     }
 
-    override fun clearTracks() {
-        runOnUiThread { tracks.clear() }
-    }
-
     private fun searchTracks() {
         presenter.onSearchRequested(binding.etSearch.text.toString())
     }
 
-    override fun showTracksHistory(receivedTracks: ArrayList<Track>) {
-        tracks.addAll(receivedTracks)
-        tracksAdapter.submitList(tracks.toList())
+    override fun showTracksHistory(receivedTracks: List<Track>) {
+        tracksAdapter.submitList(receivedTracks)
         binding.tvYouSearched.visibility = View.VISIBLE
         binding.btnClearHistory.visibility = View.VISIBLE
     }
 
     override fun hideTracksHistory() {
-        clearTracks()
-        tracksAdapter.submitList(tracks.toList())
+        tracksAdapter.submitList(listOf())
         binding.tvYouSearched.visibility = View.GONE
         binding.btnClearHistory.visibility = View.GONE
     }

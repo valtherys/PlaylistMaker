@@ -8,17 +8,17 @@ import com.practicum.playlistmaker.data.dto.TrackDto
 
 
 class SearchHistory(private val sharedPrefs: SharedPreferences) {
-    private val tracksHistory = arrayListOf<TrackDto>()
+    private val tracksHistory = mutableListOf<TrackDto>()
     private val gson = Gson()
 
-    fun getTracksHistoryCopy(): ArrayList<TrackDto> = ArrayList(tracksHistory)
+    fun getTracksHistoryCopy(): List<TrackDto> = tracksHistory.toList()
 
 
     fun readTracksHistory() {
         tracksHistory.clear()
         val json = sharedPrefs.getString(TRACKS_HISTORY_KEY, null) ?: return
         if (!json.isBlank()) {
-            val type = object : TypeToken<ArrayList<TrackDto>>() {}.type
+            val type = object : TypeToken<MutableList<TrackDto>>() {}.type
             tracksHistory.addAll(gson.fromJson(json, type))
         }
     }
