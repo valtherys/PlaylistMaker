@@ -5,16 +5,17 @@ import com.practicum.playlistmaker.domain.models.TracksHistory
 import com.practicum.playlistmaker.domain.api.history.TracksHistoryRepository
 import com.practicum.playlistmaker.domain.models.Track
 
-class TracksHistoryRepositoryImpl(private val searchHistory: SearchHistory) :
+class TracksHistoryRepositoryImpl(private val storage: StorageClient<List<TrackDto>>) :
     TracksHistoryRepository {
+    private var tracksHistory = mutableListOf<TrackDto>()
+
     override fun readTracksHistory() {
-        searchHistory.readTracksHistory()
+        tracksHistory = storage.getData()?.toMutableList() ?: mutableListOf()
     }
 
     override fun getTracksHistory(): TracksHistory {
-        val tracksRow = searchHistory.getTracksHistoryCopy()
         try {
-            val tracks = tracksRow.map {
+            val tracks = tracksHistory.map {
                 Track(
                     trackName = it.trackName,
                     artistName = it.artistName,
@@ -47,10 +48,24 @@ class TracksHistoryRepositoryImpl(private val searchHistory: SearchHistory) :
             country = track.country,
             previewUrl = track.previewUrl
         )
-        searchHistory.saveTrackInHistory(trackDto)
+        addTrackInTracksHistory(trackDto)
+        storage.storeData(tracksHistory.toList())
     }
 
-    override fun clearTrackHistory() {
-        searchHistory.clearTracksHistory()
+    override fun clearTracksHistory() {
+        tracksHistory.clear()
+        storage.storeData(listOf())
+    }
+
+    fun addTrackInTracksHistory(track: TrackDto) {
+        tracksHistory.removeAll { it.trackId == track.trackId }
+        tracksHistory.add(track)
+        if (tracksHistory.size > MAX_HISTORY_SIZE) {
+            tracksHistory.removeAt(0)
+        }
+    }
+
+    companion object {
+        private const val MAX_HISTORY_SIZE = 10
     }
 }

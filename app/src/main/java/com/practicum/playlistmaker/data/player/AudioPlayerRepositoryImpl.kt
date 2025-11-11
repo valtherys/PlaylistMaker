@@ -13,10 +13,6 @@ class AudioPlayerRepositoryImpl(private val audioPlayer: AudioPlayer) : AudioPla
         audioPlayer.setStateListener(listener)
     }
 
-    override fun removeCallbacks() {
-        audioPlayer.removeCallbacks()
-    }
-
     override fun pausePlayer() {
         audioPlayer.pausePlayer()
     }
@@ -25,7 +21,7 @@ class AudioPlayerRepositoryImpl(private val audioPlayer: AudioPlayer) : AudioPla
         audioPlayer.playbackControl()
     }
 
-    override fun release() {
-        audioPlayer.release()
+    override fun onRelease() {
+        audioPlayer.onRelease()
     }
 }

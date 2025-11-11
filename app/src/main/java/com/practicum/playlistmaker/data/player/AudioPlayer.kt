@@ -85,6 +85,11 @@ class AudioPlayer {
         mainThreadHandler.removeCallbacksAndMessages(null)
     }
 
+    fun onRelease(){
+        removeCallbacks()
+        release()
+    }
+
     companion object {
         private const val TIMER_UPDATE_DELAY = 300L
         private const val LAST_CURRENT_POSITION_DEFAULT = -1

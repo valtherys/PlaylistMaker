@@ -1,17 +1,39 @@
 package com.practicum.playlistmaker.data.settings
 
+import androidx.appcompat.app.AppCompatDelegate
+import com.practicum.playlistmaker.data.history.StorageClient
 import com.practicum.playlistmaker.domain.api.settings.UserSettingsRepository
 
-class UserSettingsRepositoryImpl(private val themeSwitcher: ThemeSwitcher) :
+class UserSettingsRepositoryImpl(private val storage: StorageClient<Boolean>) :
     UserSettingsRepository {
-    override fun getSavedTheme() = themeSwitcher.getSavedTheme()
+    var darkTheme = false
+        private set
+
+    override fun getSavedTheme(): Boolean {
+        darkTheme = storage.getData() ?: false
+        return darkTheme
+    }
 
 
     override fun applySavedTheme() {
-        themeSwitcher.applySavedTheme()
+        getSavedTheme()
+        setTheme(darkTheme)
     }
 
     override fun switchTheme(param: Boolean) {
-        themeSwitcher.switchTheme(param)
+        darkTheme = param
+        storage.storeData(param)
+
+        setTheme(param)
+    }
+
+    private fun setTheme(param: Boolean) {
+        AppCompatDelegate.setDefaultNightMode(
+            if (param) {
+                AppCompatDelegate.MODE_NIGHT_YES
+            } else {
+                AppCompatDelegate.MODE_NIGHT_NO
+            }
+        )
     }
 }
