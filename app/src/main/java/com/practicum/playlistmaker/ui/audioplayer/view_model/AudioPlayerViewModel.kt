@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.presentation.player
+package com.practicum.playlistmaker.ui.audioplayer.view_model
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,7 +9,6 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.domain.api.player.AudioPlayerEventListener
 import com.practicum.playlistmaker.domain.api.player.AudioPlayerInteractor
-import com.practicum.playlistmaker.ui.audioplayer.view_model.PlayerState
 import java.text.SimpleDateFormat
 import java.util.Locale
 

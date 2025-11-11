@@ -24,7 +24,7 @@ class PrefsStorageClient<T>(
                 try {
                     prefs.edit { putString(dataKey, gson.toJson(data, type)) }
                 } catch (e: Exception){
-                    Log.w("shared prefs", "Failed to store type $type")
+                    Log.w("shared prefs", "Failed to store type $type, $e")
                 }
             }
         }
@@ -46,7 +46,7 @@ class PrefsStorageClient<T>(
                         gson.fromJson(dataJson, type)
                     }
                 } catch (e: Exception){
-                    Log.w("shared prefs", "Failed to get from store type $type")
+                    Log.w("shared prefs", "Failed to get from store type $type, $e")
                     return null
                 }
             }
