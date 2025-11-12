@@ -43,12 +43,6 @@ object Creator {
     private const val APP_THEME_KEY = "DARK_THEME"
     private const val ITUNES_BASE_URL = "https://itunes.apple.com/"
 
-    private val mediaPlayer: MediaPlayer? = null
-
-    private fun getMediaPlayer(): MediaPlayer {
-        return mediaPlayer ?: MediaPlayer()
-    }
-
     private val retrofit by lazy {
         Retrofit.Builder().baseUrl(ITUNES_BASE_URL).addConverterFactory(
             GsonConverterFactory.create()
@@ -57,6 +51,10 @@ object Creator {
 
     fun init(context: Context) {
         appContext = context.applicationContext
+    }
+
+    private fun getMediaPlayer(): MediaPlayer {
+        return MediaPlayer()
     }
 
     private fun getITunesApiService(): ITunesApiService {

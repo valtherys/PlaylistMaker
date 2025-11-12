@@ -3,10 +3,9 @@ package com.practicum.playlistmaker.data.player
 import android.media.MediaPlayer
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import com.practicum.playlistmaker.domain.api.player.AudioPlayerEventListener
 
-class AudioPlayer(var mediaPlayer: MediaPlayer?) {
+class AudioPlayer(var mediaPlayer: MediaPlayer) {
     private var playerState = PlayerState.STATE_DEFAULT
 
     private var listener: AudioPlayerEventListener? = null
@@ -16,12 +15,12 @@ class AudioPlayer(var mediaPlayer: MediaPlayer?) {
 
     private val updateTimerTask = object : Runnable {
         override fun run() {
-            val currentPosition = mediaPlayer?.currentPosition
+            val currentPosition = mediaPlayer.currentPosition
             if (currentPosition != lastCurrentPosition) {
-                listener?.onPlayerChangePosition(currentPosition ?: LAST_CURRENT_POSITION_DEFAULT)
-                lastCurrentPosition = currentPosition ?: LAST_CURRENT_POSITION_DEFAULT
+                listener?.onPlayerChangePosition(currentPosition)
+                lastCurrentPosition = currentPosition
             }
-            if (playerState == PlayerState.STATE_PLAYING && mediaPlayer?.isPlaying ?: false) {
+            if (playerState == PlayerState.STATE_PLAYING && mediaPlayer.isPlaying) {
                 mainThreadHandler.postDelayed(this, TIMER_UPDATE_DELAY)
             }
         }
@@ -32,23 +31,23 @@ class AudioPlayer(var mediaPlayer: MediaPlayer?) {
     }
 
     fun preparePlayer(dataSource: String?) {
-        mediaPlayer?.setOnPreparedListener {
+        mediaPlayer.setOnPreparedListener {
             listener?.onPlayerPrepared()
             playerState = PlayerState.STATE_PREPARED
         }
-        mediaPlayer?.setOnCompletionListener {
+        mediaPlayer.setOnCompletionListener {
             mainThreadHandler.removeCallbacks(updateTimerTask)
             listener?.onPlayerCompletion()
             playerState = PlayerState.STATE_PREPARED
             lastCurrentPosition = LAST_CURRENT_POSITION_DEFAULT
         }
-        Log.d("AudioPlayer", "preparePlayer url = '$dataSource'")
-        mediaPlayer?.setDataSource(dataSource)
-        mediaPlayer?.prepareAsync()
+
+        mediaPlayer.setDataSource(dataSource)
+        mediaPlayer.prepareAsync()
     }
 
     fun startPlayer() {
-        mediaPlayer?.start()
+        mediaPlayer.start()
         lastCurrentPosition = LAST_CURRENT_POSITION_DEFAULT
         mainThreadHandler.post(updateTimerTask)
         playerState = PlayerState.STATE_PLAYING
@@ -56,8 +55,8 @@ class AudioPlayer(var mediaPlayer: MediaPlayer?) {
     }
 
     fun pausePlayer() {
-        if (mediaPlayer?.isPlaying ?: false) {
-            mediaPlayer?.pause()
+        if (mediaPlayer.isPlaying) {
+            mediaPlayer.pause()
             mainThreadHandler.removeCallbacks(updateTimerTask)
             playerState = PlayerState.STATE_PAUSED
             listener?.onPlayerPause()
@@ -80,8 +79,7 @@ class AudioPlayer(var mediaPlayer: MediaPlayer?) {
 
     fun onRelease(){
         mainThreadHandler.removeCallbacksAndMessages(null)
-        mediaPlayer?.release()
-        mediaPlayer = null
+        mediaPlayer.release()
     }
 
     companion object {
