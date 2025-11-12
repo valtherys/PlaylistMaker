@@ -12,16 +12,12 @@ import com.practicum.playlistmaker.domain.api.player.AudioPlayerInteractor
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-
 class AudioPlayerViewModel(
     private val interactor: AudioPlayerInteractor,
     private val previewUrl: String
 ) : ViewModel(), AudioPlayerEventListener {
     private val playerStateLiveData = MutableLiveData<PlayerState>(PlayerState.Default)
     fun observePlayerState(): LiveData<PlayerState> = playerStateLiveData
-
-    private val progressTimeLiveData = MutableLiveData("00:00")
-    fun observeProgressTime(): LiveData<String> = progressTimeLiveData
 
     private val dateFormat by lazy {
         SimpleDateFormat(
@@ -50,7 +46,7 @@ class AudioPlayerViewModel(
     }
 
     override fun onPlayerChangePosition(position: Int) {
-        progressTimeLiveData.value = dateFormat.format(position)
+        playerStateLiveData.value = PlayerState.TimeProgress(dateFormat.format(position))
     }
 
     override fun onPlayerPause() {

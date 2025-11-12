@@ -1,10 +1,12 @@
 package com.practicum.playlistmaker.creator
 
 import android.content.Context
+import android.media.MediaPlayer
 import com.google.gson.reflect.TypeToken
 import com.practicum.playlistmaker.data.dto.TrackDto
 import com.practicum.playlistmaker.data.history.PrefsStorageClient
 import com.practicum.playlistmaker.data.history.TracksHistoryRepositoryImpl
+import com.practicum.playlistmaker.data.network.ITunesApiService
 import com.practicum.playlistmaker.data.network.RetrofitNetworkClient
 import com.practicum.playlistmaker.data.player.AudioPlayer
 import com.practicum.playlistmaker.data.player.AudioPlayerRepositoryImpl
@@ -32,18 +34,37 @@ import com.practicum.playlistmaker.domain.impl.sharing.SharingInteractorImpl
 import com.practicum.playlistmaker.domain.impl.history.TracksHistoryInteractorImpl
 import com.practicum.playlistmaker.domain.impl.search.TracksSearchInteractorImpl
 import com.practicum.playlistmaker.domain.impl.settings.UserSettingsInteractorImpl
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 object Creator {
     private lateinit var appContext: Context
     private const val TRACKS_HISTORY_KEY = "TRACKS_HISTORY"
     private const val APP_THEME_KEY = "DARK_THEME"
+    private const val ITUNES_BASE_URL = "https://itunes.apple.com/"
+
+    private val mediaPlayer: MediaPlayer? = null
+
+    private fun getMediaPlayer(): MediaPlayer {
+        return mediaPlayer ?: MediaPlayer()
+    }
+
+    private val retrofit by lazy {
+        Retrofit.Builder().baseUrl(ITUNES_BASE_URL).addConverterFactory(
+            GsonConverterFactory.create()
+        ).build()
+    }
 
     fun init(context: Context) {
         appContext = context.applicationContext
     }
 
+    private fun getITunesApiService(): ITunesApiService {
+        return retrofit.create(ITunesApiService::class.java)
+    }
+
     private fun getTracksRepository(): TracksSearchRepository {
-        return TracksSearchRepositoryImpl(RetrofitNetworkClient())
+        return TracksSearchRepositoryImpl(RetrofitNetworkClient(getITunesApiService()))
     }
 
     fun provideTracksInteractor(): TracksSearchInteractor {
@@ -99,7 +120,7 @@ object Creator {
     }
 
     private fun getAudioPlayerRepository(): AudioPlayerRepository {
-        return AudioPlayerRepositoryImpl(AudioPlayer())
+        return AudioPlayerRepositoryImpl(AudioPlayer(getMediaPlayer()))
     }
 
     fun provideAudioPlayerInteractor(): AudioPlayerInteractor {

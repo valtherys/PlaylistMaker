@@ -56,10 +56,6 @@ class AudioPlayerActivity : AppCompatActivity() {
             render(it)
         }
 
-        viewModel.observeProgressTime().observe(this) {
-            onPlayerChangePosition(it)
-        }
-
         binding.btnBack.setOnClickListener { finish() }
     }
 
@@ -123,13 +119,14 @@ class AudioPlayerActivity : AppCompatActivity() {
         }
     }
 
-    fun render(state: PlayerState){
+    fun render(state: PlayerState) {
         when (state) {
             PlayerState.Default -> binding.btnPlay.isEnabled = false
             PlayerState.Paused -> onPlayerPause()
             PlayerState.Playing -> onPlayerStart()
             PlayerState.Prepared -> onPlayerPrepared()
             PlayerState.Complete -> onPlayerCompletion()
+            is PlayerState.TimeProgress -> onPlayerChangePosition(state.progress)
         }
     }
 
