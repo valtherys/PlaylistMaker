@@ -1,8 +1,8 @@
 package com.practicum.playlistmaker.domain.models
 
-import com.practicum.playlistmaker.presentation.player.ResultType
+import com.practicum.playlistmaker.ui.search.view_model.ResultType
 
-data class TracksResponse (
+data class TracksResponse(
     val resultCode: Int,
     val tracks: List<Track>,
     val resultType: ResultType

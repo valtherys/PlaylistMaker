@@ -6,7 +6,7 @@ import com.practicum.playlistmaker.data.network.HttpStatusCodes
 import com.practicum.playlistmaker.domain.api.search.TracksSearchRepository
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.domain.models.TracksResponse
-import com.practicum.playlistmaker.presentation.player.ResultType
+import com.practicum.playlistmaker.ui.search.view_model.ResultType
 
 class TracksSearchRepositoryImpl(private val networkClient: NetworkClient) :
     TracksSearchRepository {

@@ -11,5 +11,5 @@ interface TracksHistoryRepository {
 
     fun saveTrackInHistory(track: Track)
 
-    fun clearTrackHistory()
+    fun clearTracksHistory()
 }

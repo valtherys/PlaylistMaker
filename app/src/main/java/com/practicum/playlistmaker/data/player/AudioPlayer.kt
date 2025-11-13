@@ -5,8 +5,7 @@ import android.os.Handler
 import android.os.Looper
 import com.practicum.playlistmaker.domain.api.player.AudioPlayerEventListener
 
-class AudioPlayer {
-    private val mediaPlayer = MediaPlayer()
+class AudioPlayer(var mediaPlayer: MediaPlayer) {
     private var playerState = PlayerState.STATE_DEFAULT
 
     private var listener: AudioPlayerEventListener? = null
@@ -42,6 +41,7 @@ class AudioPlayer {
             playerState = PlayerState.STATE_PREPARED
             lastCurrentPosition = LAST_CURRENT_POSITION_DEFAULT
         }
+
         mediaPlayer.setDataSource(dataSource)
         mediaPlayer.prepareAsync()
     }
@@ -77,12 +77,9 @@ class AudioPlayer {
         }
     }
 
-    fun release() {
-        mediaPlayer.release()
-    }
-
-    fun removeCallbacks() {
+    fun onRelease(){
         mainThreadHandler.removeCallbacksAndMessages(null)
+        mediaPlayer.release()
     }
 
     companion object {

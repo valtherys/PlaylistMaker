@@ -4,7 +4,6 @@ interface AudioPlayerRepository {
     fun preparePlayer(dataSource: String?)
     fun pausePlayer()
     fun playbackControl()
-    fun release()
+    fun onRelease()
     fun setStateListener(listener: AudioPlayerEventListener?)
-    fun removeCallbacks()
 }
