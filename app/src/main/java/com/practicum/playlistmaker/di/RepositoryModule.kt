@@ -18,7 +18,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val repositoryModule = module {
-    single<TracksHistoryRepository> {
+    factory<TracksHistoryRepository> {
         TracksHistoryRepositoryImpl(get(TRACKS_CLIENT))
     }
 
@@ -26,7 +26,7 @@ val repositoryModule = module {
         AudioPlayerRepositoryImpl(get())
     }
 
-    single<TracksSearchRepository> {
+    factory<TracksSearchRepository> {
         TracksSearchRepositoryImpl(get())
     }
 
@@ -42,7 +42,7 @@ val repositoryModule = module {
         AppConfigRepositoryImpl(androidContext())
     }
 
-    single<ExternalNavigator> {
+    factory<ExternalNavigator> {
         ExternalNavigatorImpl(androidContext())
     }
 }
