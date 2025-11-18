@@ -54,7 +54,7 @@ class TracksHistoryRepositoryImpl(private val storage: StorageClient<List<TrackD
 
     override fun clearTracksHistory() {
         tracksHistory.clear()
-        storage.storeData(listOf())
+        storage.clearData()
     }
 
     fun addTrackInTracksHistory(track: TrackDto) {

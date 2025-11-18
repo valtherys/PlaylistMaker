@@ -2,17 +2,15 @@ package com.practicum.playlistmaker.ui.settings.activity
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.practicum.playlistmaker.databinding.ActivitySettingsBinding
 import com.practicum.playlistmaker.ui.settings.view_model.UserSettingsViewModel
 import com.practicum.playlistmaker.utils.applySystemBarsPadding
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
-    private val viewModel: UserSettingsViewModel by viewModels {
-        UserSettingsViewModel.Companion.getFactory()
-    }
+    private val viewModel: UserSettingsViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

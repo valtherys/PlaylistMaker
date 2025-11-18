@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.Group
 import com.bumptech.glide.Glide
@@ -17,16 +16,15 @@ import com.practicum.playlistmaker.ui.audioplayer.view_model.PlayerState
 import com.practicum.playlistmaker.ui.models.TrackParcelable
 import com.practicum.playlistmaker.utils.applySystemBarsPadding
 import com.practicum.playlistmaker.utils.dpToPx
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class AudioPlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAudioPlayerBinding
     private var track: TrackParcelable? = null
     private val albumCornerRadiusDp: Float = ALBUM_CORNER_RADIUS_DP
 
-    private val viewModel: AudioPlayerViewModel by viewModels {
-        val previewUrl = track?.previewUrl
-        AudioPlayerViewModel.Companion.getFactory(previewUrl ?: "")
-    }
+    private val viewModel: AudioPlayerViewModel by viewModel { parametersOf(track?.previewUrl) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

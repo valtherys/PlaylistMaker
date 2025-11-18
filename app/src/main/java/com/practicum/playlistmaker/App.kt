@@ -1,15 +1,26 @@
 package com.practicum.playlistmaker
 
 import android.app.Application
-import com.practicum.playlistmaker.creator.Creator
+import com.practicum.playlistmaker.di.dataModule
+import com.practicum.playlistmaker.di.interactorModule
+import com.practicum.playlistmaker.di.repositoryModule
+import com.practicum.playlistmaker.di.utilsModule
+import com.practicum.playlistmaker.di.viewModelModule
+import com.practicum.playlistmaker.domain.api.settings.UserSettingsInteractor
+import org.koin.android.ext.android.inject
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.GlobalContext.startKoin
 
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        Creator.init(this)
+        startKoin {
+            androidContext(this@App)
+            modules(dataModule, repositoryModule, interactorModule, viewModelModule, utilsModule)
+        }
 
-        val userSettingsInteractor = Creator.provideUserSettingsInteractor()
+        val userSettingsInteractor: UserSettingsInteractor by inject()
         userSettingsInteractor.applySavedTheme()
     }
 }
