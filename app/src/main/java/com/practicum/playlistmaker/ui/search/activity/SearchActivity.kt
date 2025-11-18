@@ -9,7 +9,6 @@ import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,6 +23,7 @@ import com.practicum.playlistmaker.ui.search.view_model.TracksViewModel
 import com.practicum.playlistmaker.ui.audioplayer.activity.AudioPlayerActivity
 import com.practicum.playlistmaker.ui.mappers.toParcelable
 import com.practicum.playlistmaker.utils.applySystemBarsPadding
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
     private var query: String = QUERY_DEF
@@ -31,9 +31,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var tracksAdapter: TracksAdapter
     private var isClickAllowed = true
     private var mainThreadHandler = Handler(Looper.getMainLooper())
-    private val viewModel: TracksViewModel by viewModels {
-        TracksViewModel.getFactory()
-    }
+    private val viewModel: TracksViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

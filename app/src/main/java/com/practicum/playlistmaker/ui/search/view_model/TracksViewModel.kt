@@ -6,10 +6,6 @@ import android.os.SystemClock
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.domain.api.history.TracksHistoryInteractor
 import com.practicum.playlistmaker.domain.api.search.SearchMessagesInteractor
 import com.practicum.playlistmaker.domain.api.search.TracksSearchInteractor
@@ -28,7 +24,6 @@ class TracksViewModel(
     private var latestSearchedText: String? = null
     private val handler = Handler(Looper.getMainLooper())
 
-
     init {
         historyInteractor.readTracksHistory()
     }
@@ -45,7 +40,6 @@ class TracksViewModel(
         val postTime = SystemClock.uptimeMillis() + SEARCH_DEBOUNCE_DELAY
         handler.postAtTime(searchRunnable, SEARCH_REQUEST_TOKEN, postTime)
     }
-
 
     fun onSearchRequested(expression: String) {
         if (expression.isNotBlank()) {
@@ -120,14 +114,5 @@ class TracksViewModel(
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private val SEARCH_REQUEST_TOKEN = Any()
-
-        fun getFactory(): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val searchInteractor = Creator.provideTracksInteractor()
-                val historyInteractor = Creator.provideTracksHistoryInteractor()
-                val searchMessagesInteractor = Creator.provideSearchMessagesInteractor()
-                TracksViewModel(searchInteractor, historyInteractor, searchMessagesInteractor)
-            }
-        }
     }
 }
