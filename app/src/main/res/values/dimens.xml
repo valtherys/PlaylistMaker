@@ -13,4 +13,10 @@
     <dimen name="text_size_artist">11sp</dimen>
 
     <dimen name="text_track_data_player">13sp</dimen>
+
+    <dimen name="placeholder_margin_top">106dp</dimen>
+    <dimen name="placeholder_padding_horizontal">16dp</dimen>
+    <dimen name="placeholder_image_size">120dp</dimen>
+    <dimen name="placeholder_image_margin_bottom">16dp</dimen>
+    <dimen name="placeholder_text_margin_bottom">24dp</dimen>
 </resources>
