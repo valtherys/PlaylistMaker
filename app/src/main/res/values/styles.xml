@@ -46,12 +46,7 @@
         <item name="android:scaleType">centerCrop</item>
     </style>
 
-    <style name="ButtonSearchScreen" parent="Widget.MaterialComponents.Button.UnelevatedButton">
-        <item name="backgroundTint">?attr/colorOnPrimary</item>
-        <item name="textAllCaps">false</item>
-        <item name="android:textColor">?attr/colorPrimary</item>
-        <item name="cornerRadius">54dp</item>
-    </style>
+
 
     <style name="TextViewTrackFields">
         <item name="android:textAppearance">@style/YSRegular13</item>
@@ -69,5 +64,44 @@
         <item name="android:lines">1</item>
         <item name="android:layout_marginStart">8dp</item>
     </style>
+
+    <style name="Placeholder">
+        <item name="android:orientation">vertical</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/placeholder_margin_top</item>
+        <item name="android:paddingHorizontal">@dimen/placeholder_padding_horizontal</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="PlaceholderImage">
+        <item name="android:layout_width">@dimen/placeholder_image_size</item>
+        <item name="android:layout_height">@dimen/placeholder_image_size</item>
+        <item name="android:layout_marginBottom">@dimen/placeholder_image_margin_bottom</item>
+        <item name="android:scaleType">centerCrop</item>
+    </style>
+
+    <style name="PlaceholderTextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">@dimen/placeholder_text_margin_bottom</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:textAppearance">@style/YSMedium19</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="PlaceholderButton" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="backgroundTint">?attr/colorOnPrimary</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_marginTop">24dp</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:textAppearance">@style/YSMedium14</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="cornerRadius">54dp</item>
+    </style>
+
+
 
 </resources>

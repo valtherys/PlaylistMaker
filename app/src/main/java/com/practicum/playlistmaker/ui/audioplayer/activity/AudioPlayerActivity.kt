@@ -23,7 +23,6 @@ class AudioPlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAudioPlayerBinding
     private var track: TrackParcelable? = null
     private val albumCornerRadiusDp: Float = ALBUM_CORNER_RADIUS_DP
-
     private val viewModel: AudioPlayerViewModel by viewModel { parametersOf(track?.previewUrl) }
 
     override fun onCreate(savedInstanceState: Bundle?) {

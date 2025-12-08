@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/btn_create_new_playlist"
+        style="@style/PlaceholderButton"
+        android:layout_marginTop="18dp"
+        android:text="@string/new_playlist"/>
+
+    <LinearLayout
+        android:id="@+id/ll_placeholder"
+        style="@style/Placeholder"
+        android:layout_marginTop="40dp">
+
+        <ImageView
+            android:id="@+id/iv_placeholder"
+            style="@style/PlaceholderImage"
+            android:src="@drawable/ic_nothing_found_120"
+            android:contentDescription="@string/nothing_found" />
+
+        <TextView
+            android:id="@+id/tv_comment"
+            style="@style/PlaceholderTextView"
+            android:text="@string/empty_playlists" />
+    </LinearLayout>
+
+</LinearLayout>

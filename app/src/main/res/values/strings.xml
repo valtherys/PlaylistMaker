@@ -37,4 +37,9 @@
     <string name="country">Страна</string>
     <string name="count_start">00:00</string>
     <string name="timer_anchor_text">88:88</string>
+    <string name="empty_selected_tracks">Ваша медиатека пуста</string>
+    <string name="empty_playlists">Вы не создали \n ни одного плейлиста</string>
+    <string name="new_playlist">Новый плейлист</string>
+    <string name="selected_tracks">Избранные треки</string>
+    <string name="playlists">Плейлисты</string>
 </resources>
