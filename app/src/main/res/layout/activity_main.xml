@@ -4,39 +4,27 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSecondary"
     android:orientation="vertical"
-    android:paddingHorizontal="16dp"
-    android:paddingTop="14dp"
-    android:paddingBottom="28dp">
+    android:background="?attr/colorPrimary">
 
-    <TextView
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_container_view"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/navigation_graph" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="24dp"
-        android:text="@string/app_name"
-        android:textAppearance="@style/YSMedium22"
-        android:textColor="?attr/colorOnSecondary" />
-
-    <Button
-        android:id="@+id/btn_search"
-        style="@style/ButtonMainScreen"
-        android:text="@string/search"
-        android:textAppearance="@style/YSMedium22"
-        app:icon="@drawable/ic_search_24" />
-
-    <Button
-        android:id="@+id/btn_media_library"
-        style="@style/ButtonMainScreen"
-        android:text="@string/media_library"
-        android:textAppearance="@style/YSMedium22"
-        app:icon="@drawable/ic_media_library_24" />
-
-    <Button
-        android:id="@+id/btn_settings"
-        style="@style/ButtonMainScreen"
-        android:text="@string/settings"
-        android:textAppearance="@style/YSMedium22"
-        app:icon="@drawable/ic_settings_24" />
-
+        android:background="?attr/colorPrimary"
+        app:itemIconTint="@color/bottom_nav_colors"
+        app:itemTextColor="@color/bottom_nav_colors"
+        app:menu="@menu/bottom_navigation_menu"
+        app:itemTextAppearanceActive="@style/YSRegular12"
+        app:itemTextAppearanceInactive="@style/YSRegular12"
+        app:itemRippleColor="@android:color/transparent"/>
 </LinearLayout>

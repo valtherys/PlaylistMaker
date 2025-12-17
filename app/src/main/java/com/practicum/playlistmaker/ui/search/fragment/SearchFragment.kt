@@ -1,72 +1,69 @@
-package com.practicum.playlistmaker.ui.search.activity
+package com.practicum.playlistmaker.ui.search.fragment
 
-import android.content.Intent
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.enableEdgeToEdge
 
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.domain.models.Track
 import androidx.core.view.isGone
-import com.practicum.playlistmaker.databinding.ActivitySearchBinding
+import androidx.navigation.fragment.findNavController
+import com.practicum.playlistmaker.databinding.FragmentSearchBinding
+import com.practicum.playlistmaker.ui.audioplayer.fragment.AudioPlayerFragment
 import com.practicum.playlistmaker.ui.search.adapters.TracksAdapter
-import com.practicum.playlistmaker.ui.search.view_model.HistoryState
-import com.practicum.playlistmaker.ui.search.view_model.SearchState
+import com.practicum.playlistmaker.ui.search.view_model.TracksState
 import com.practicum.playlistmaker.ui.search.view_model.TracksViewModel
-import com.practicum.playlistmaker.ui.audioplayer.activity.AudioPlayerActivity
+import com.practicum.playlistmaker.ui.common.BindingFragment
 import com.practicum.playlistmaker.ui.mappers.toParcelable
-import com.practicum.playlistmaker.utils.applySystemBarsPadding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment : BindingFragment<FragmentSearchBinding>() {
     private var query: String = QUERY_DEF
-    private lateinit var binding: ActivitySearchBinding
     private lateinit var tracksAdapter: TracksAdapter
     private var isClickAllowed = true
     private var mainThreadHandler = Handler(Looper.getMainLooper())
     private val viewModel: TracksViewModel by viewModel()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        binding.root.applySystemBarsPadding()
+    override fun createBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentSearchBinding {
+        return FragmentSearchBinding.inflate(inflater, container, false)
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         tracksAdapter = TracksAdapter { track ->
             if (clickDebounce()) {
-                val trackParcelable = track.toParcelable()
-                val displayIntent = Intent(this, AudioPlayerActivity::class.java)
-                displayIntent.putExtra(
-                    AudioPlayerActivity.Companion.INTENT_EXTRA_KEY,
-                    trackParcelable
+                findNavController().navigate(
+                    R.id.action_searchFragment_to_audioPlayerFragment,
+                    AudioPlayerFragment.createArgs(track.toParcelable())
                 )
-                startActivity(displayIntent)
 
                 viewModel.onTrackClicked(track)
             }
         }
+        query = savedInstanceState?.getString(QUERY) ?: QUERY_DEF
+        binding.etSearch.setText(query)
 
+        val inputMethodManager =
+            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
 
-        val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
-
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         binding.recyclerView.adapter = tracksAdapter
 
-        binding.btnBack.setOnClickListener {
-            finish()
-        }
-
         binding.ivClear.setOnClickListener {
+            viewModel.searchResultsDebounce()
             binding.apply {
                 etSearch.setText("")
                 llPlaceholder.visibility = View.GONE
@@ -111,14 +108,11 @@ class SearchActivity : AppCompatActivity() {
                 query = s.toString()
             }
         }
+
         binding.etSearch.addTextChangedListener(simpleTextWatcher)
 
-        viewModel.observeHistoryState().observe(this) {
-            renderHistory(it)
-        }
-
-        viewModel.observeSearchStateLiveData().observe(this) {
-            renderSearch(it)
+        viewModel.observeTracksStateLiveData().observe(viewLifecycleOwner) {
+            render(it)
         }
     }
 
@@ -178,6 +172,7 @@ class SearchActivity : AppCompatActivity() {
 
 
     fun showTracksHistory(receivedTracks: List<Track>) {
+        hideLoader()
         tracksAdapter.submitList(receivedTracks)
 
         binding.apply {
@@ -196,20 +191,15 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    fun renderHistory(state: HistoryState) {
+    fun render(state: TracksState) {
         when (state) {
-            is HistoryState.Content -> showTracksHistory(state.tracks)
-            is HistoryState.Hidden -> hideTracksHistory()
-        }
-    }
-
-    fun renderSearch(state: SearchState) {
-        when (state) {
-            is SearchState.Loading -> showLoader()
-            is SearchState.Empty -> showEmptyState(state.message)
-            is SearchState.Connection -> showErrorState(state.message)
-            is SearchState.Error -> showErrorState(state.message)
-            is SearchState.Content -> showFoundTracks(state.tracks)
+            is TracksState.Loading -> showLoader()
+            is TracksState.Empty -> showEmptyState(state.message)
+            is TracksState.Connection -> showErrorState(state.message)
+            is TracksState.Error -> showErrorState(state.message)
+            is TracksState.SearchContent -> showFoundTracks(state.tracks)
+            is TracksState.HiddenHistory -> hideTracksHistory()
+            is TracksState.HistoryContent -> showTracksHistory(state.tracks)
         }
     }
 
@@ -225,12 +215,6 @@ class SearchActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(QUERY, query)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        query = savedInstanceState.getString(QUERY, QUERY_DEF)
-        binding.etSearch.setText(query)
     }
 
     companion object {

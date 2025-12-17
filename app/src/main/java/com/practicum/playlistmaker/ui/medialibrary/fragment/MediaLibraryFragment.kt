@@ -1,30 +1,35 @@
-package com.practicum.playlistmaker.ui.medialibrary.activity
+package com.practicum.playlistmaker.ui.medialibrary.fragment
 
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import com.google.android.material.tabs.TabLayoutMediator
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.databinding.ActivityMediaLibraryBinding
+import com.practicum.playlistmaker.databinding.FragmentMediaLibraryBinding
+import com.practicum.playlistmaker.ui.common.BindingFragment
 import com.practicum.playlistmaker.ui.medialibrary.adapters.MediaLibraryViewPagerAdapter
 import com.practicum.playlistmaker.ui.medialibrary.view_model.MediaLibraryViewModel
-import com.practicum.playlistmaker.utils.applySystemBarsPadding
+import com.practicum.playlistmaker.utils.dpToPx
 import com.practicum.playlistmaker.utils.setIndicatorMargins
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class MediaLibraryActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMediaLibraryBinding
+class MediaLibraryFragment : BindingFragment<FragmentMediaLibraryBinding>() {
     private lateinit var tabMediator: TabLayoutMediator
     private val viewModel: MediaLibraryViewModel by viewModel()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        binding = ActivityMediaLibraryBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        binding.root.applySystemBarsPadding()
+    override fun createBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentMediaLibraryBinding {
+        return FragmentMediaLibraryBinding.inflate(inflater, container, false)
+    }
 
-        binding.viewPager.adapter = MediaLibraryViewPagerAdapter(supportFragmentManager, lifecycle)
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.viewPager.adapter = MediaLibraryViewPagerAdapter(childFragmentManager, lifecycle)
 
         tabMediator = TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             when (position) {
@@ -35,17 +40,12 @@ class MediaLibraryActivity : AppCompatActivity() {
         tabMediator.attach()
 
         binding.tabLayout.setIndicatorMargins(
-            context = this,
-            indicatorMargin = INDICATOR_MARGIN
+            indicatorMarginPx = requireContext().dpToPx(INDICATOR_MARGIN)
         )
-
-        binding.btnBack.setOnClickListener {
-            finish()
-        }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         tabMediator.detach()
     }
 

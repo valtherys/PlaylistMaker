@@ -5,10 +5,9 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorPrimary"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context=".ui.medialibrary.activity.MediaLibraryActivity">
+    tools:context=".ui.medialibrary.fragment.MediaLibraryFragment">
 
     <TextView
         android:id="@+id/btn_back"

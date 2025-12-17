@@ -17,10 +17,10 @@ class TracksViewModel(
     val historyInteractor: TracksHistoryInteractor,
     val searchMessagesInteractor: SearchMessagesInteractor
 ) : ViewModel() {
-    private val searchStateLiveData = MutableLiveData<SearchState>()
-    fun observeSearchStateLiveData(): LiveData<SearchState> = searchStateLiveData
-    private val historyStateLiveData = MutableLiveData<HistoryState>()
-    fun observeHistoryState(): LiveData<HistoryState> = historyStateLiveData
+    private val tracksStateLiveData = MutableLiveData<TracksState>()
+    var searchIsNotCanceled = true
+    fun observeTracksStateLiveData(): LiveData<TracksState> = tracksStateLiveData
+
     private var latestSearchedText: String? = null
     private val handler = Handler(Looper.getMainLooper())
 
@@ -41,57 +41,69 @@ class TracksViewModel(
         handler.postAtTime(searchRunnable, SEARCH_REQUEST_TOKEN, postTime)
     }
 
+    fun searchResultsDebounce(): Boolean{
+        val current = searchIsNotCanceled
+        if (searchIsNotCanceled) {
+            searchIsNotCanceled = false
+            handler.postDelayed({ searchIsNotCanceled = true },SEARCH_DEBOUNCE_DELAY)
+        }
+        return current
+    }
+
     fun onSearchRequested(expression: String) {
         if (expression.isNotBlank()) {
-            searchStateLiveData.postValue(SearchState.Loading)
+            tracksStateLiveData.postValue(TracksState.Loading)
 
             searchInteractor.searchTracks(
                 expression,
                 object : TracksSearchInteractor.TracksConsumer {
                     override fun consume(response: TracksResponse) {
-
-                        when (response.resultType) {
-                            ResultType.EMPTY -> searchStateLiveData.postValue(
-                                SearchState.Empty(
-                                    searchMessagesInteractor.getEmptyStateMessage()
-                                )
-                            )
-
-                            ResultType.SUCCESS -> searchStateLiveData.postValue(
-                                SearchState.Content(
-                                    response.tracks
-                                )
-                            )
-
-                            ResultType.CONNECTION -> searchStateLiveData.postValue(
-                                SearchState.Connection(
-                                    searchMessagesInteractor.getConnectionErrorMessage()
-                                )
-                            )
-
-                            ResultType.ERROR -> searchStateLiveData.postValue(
-                                SearchState.Error(
-                                    String.format(
-                                        searchMessagesInteractor.getErrorMessage(),
-                                        response.resultCode.toString()
+                        if (searchIsNotCanceled){
+                            when (response.resultType) {
+                                ResultType.EMPTY -> tracksStateLiveData.postValue(
+                                    TracksState.Empty(
+                                        searchMessagesInteractor.getEmptyStateMessage()
                                     )
                                 )
-                            )
 
-                        }
+                                ResultType.SUCCESS -> tracksStateLiveData.postValue(
+                                    TracksState.SearchContent(
+                                        response.tracks
+                                    )
+                                )
+
+                                ResultType.CONNECTION -> tracksStateLiveData.postValue(
+                                    TracksState.Connection(
+                                        searchMessagesInteractor.getConnectionErrorMessage()
+                                    )
+                                )
+
+                                ResultType.ERROR -> tracksStateLiveData.postValue(
+                                    TracksState.Error(
+                                        String.format(
+                                            searchMessagesInteractor.getErrorMessage(),
+                                            response.resultCode.toString()
+                                        )
+                                    )
+                                )
+
+                            }
+                        } else onShowTracksHistory()
                     }
                 })
         }
     }
 
     fun onShowTracksHistory() {
+        tracksStateLiveData.postValue(TracksState.HiddenHistory)
+
         historyInteractor.getTracksFromHistory(object :
             TracksHistoryInteractor.TracksHistoryConsumer {
             override fun consume(tracks: List<Track>) {
                 if (tracks.isEmpty()) {
-                    historyStateLiveData.postValue(HistoryState.Hidden)
+                    tracksStateLiveData.postValue(TracksState.HiddenHistory)
                 } else {
-                    historyStateLiveData.postValue(HistoryState.Content(tracks.reversed()))
+                    tracksStateLiveData.postValue(TracksState.HistoryContent(tracks.reversed()))
                 }
             }
         })
@@ -103,12 +115,12 @@ class TracksViewModel(
 
     fun onDeleteTracksHistory() {
         historyInteractor.deleteTracksHistory()
-        historyStateLiveData.postValue(HistoryState.Hidden)
+        tracksStateLiveData.postValue(TracksState.HiddenHistory)
     }
 
     override fun onCleared() {
         super.onCleared()
-        handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
+        handler.removeCallbacksAndMessages(null)
     }
 
     companion object {
