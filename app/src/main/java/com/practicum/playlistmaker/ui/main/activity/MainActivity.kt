@@ -1,14 +1,14 @@
 package com.practicum.playlistmaker.ui.main.activity
 
-import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivityMainBinding
-import com.practicum.playlistmaker.ui.medialibrary.activity.MediaLibraryActivity
-import com.practicum.playlistmaker.ui.search.activity.SearchActivity
-import com.practicum.playlistmaker.ui.settings.activity.SettingsActivity
-import com.practicum.playlistmaker.utils.applySystemBarsPadding
+import com.practicum.playlistmaker.utils.applyBottomNavViewPadding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -18,20 +18,23 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.root.applySystemBarsPadding()
 
-        binding.btnSearch.setOnClickListener {
-            val displayIntent = Intent(this, SearchActivity::class.java)
-            startActivity(displayIntent)
-        }
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container_view) as NavHostFragment
+        val navController = navHostFragment.navController
+        binding.bottomNavigationView.setupWithNavController(navController)
+        binding.bottomNavigationView.applyBottomNavViewPadding()
 
-        binding.btnMediaLibrary.setOnClickListener {
-            val displayIntent = Intent(this, MediaLibraryActivity::class.java)
-            startActivity(displayIntent)
-        }
-        binding.btnSettings.setOnClickListener {
-            val displayIntent = Intent(this, SettingsActivity::class.java)
-            startActivity(displayIntent)
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.audioPlayerFragment -> {
+                    binding.bottomNavigationView.visibility = View.GONE
+                }
+
+                else -> {
+                    binding.bottomNavigationView.visibility = View.VISIBLE
+                }
+            }
         }
     }
 }

@@ -6,10 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
+import com.practicum.playlistmaker.utils.applySystemBarsPadding
+import com.practicum.playlistmaker.utils.applySystemBarsPaddingExceptBottom
 
 abstract class BindingFragment<T : ViewBinding> : Fragment() {
     private var _binding: T? = null
     protected val binding get() = _binding!!
+    protected open val applyBottomInset: Boolean = false
 
     abstract fun createBinding(inflater: LayoutInflater, container: ViewGroup?): T
 
@@ -20,6 +23,17 @@ abstract class BindingFragment<T : ViewBinding> : Fragment() {
     ): View? {
         _binding = createBinding(inflater, container)
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.root.apply {
+            if (applyBottomInset) {
+                applySystemBarsPadding()
+            } else {
+                applySystemBarsPaddingExceptBottom()
+            }
+        }
     }
 
     override fun onDestroyView() {
