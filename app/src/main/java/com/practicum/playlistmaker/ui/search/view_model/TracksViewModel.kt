@@ -1,16 +1,16 @@
 package com.practicum.playlistmaker.ui.search.view_model
 
-import android.os.Handler
-import android.os.Looper
-import android.os.SystemClock
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.domain.api.history.TracksHistoryInteractor
 import com.practicum.playlistmaker.domain.api.search.SearchMessagesInteractor
 import com.practicum.playlistmaker.domain.api.search.TracksSearchInteractor
 import com.practicum.playlistmaker.domain.models.Track
-import com.practicum.playlistmaker.domain.models.TracksResponse
+import com.practicum.playlistmaker.utils.debounce
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 class TracksViewModel(
     val searchInteractor: TracksSearchInteractor,
@@ -18,80 +18,63 @@ class TracksViewModel(
     val searchMessagesInteractor: SearchMessagesInteractor
 ) : ViewModel() {
     private val tracksStateLiveData = MutableLiveData<TracksState>()
-    var searchIsNotCanceled = true
+    private var latestSearchText: String? = null
+    private var searchJob: Job? = null
     fun observeTracksStateLiveData(): LiveData<TracksState> = tracksStateLiveData
 
-    private var latestSearchedText: String? = null
-    private val handler = Handler(Looper.getMainLooper())
+    val onSearchDebounce = debounce<String>(
+        delayMillis = SEARCH_DEBOUNCE_DELAY,
+        coroutineScope = viewModelScope,
+        useLastParam = true,
+        action = { request -> onSearchRequested(request) }
+    )
 
     init {
         historyInteractor.readTracksHistory()
     }
 
-    fun searchDebounce(changedText: String) {
-        if (latestSearchedText == changedText) {
-            return
-        }
-        this.latestSearchedText = changedText
-
-        handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
-        val searchRunnable = Runnable { onSearchRequested(changedText) }
-
-        val postTime = SystemClock.uptimeMillis() + SEARCH_DEBOUNCE_DELAY
-        handler.postAtTime(searchRunnable, SEARCH_REQUEST_TOKEN, postTime)
-    }
-
-    fun searchResultsDebounce(): Boolean{
-        val current = searchIsNotCanceled
-        if (searchIsNotCanceled) {
-            searchIsNotCanceled = false
-            handler.postDelayed({ searchIsNotCanceled = true },SEARCH_DEBOUNCE_DELAY)
-        }
-        return current
-    }
-
     fun onSearchRequested(expression: String) {
+        searchJob?.cancel()
         if (expression.isNotBlank()) {
             tracksStateLiveData.postValue(TracksState.Loading)
 
-            searchInteractor.searchTracks(
-                expression,
-                object : TracksSearchInteractor.TracksConsumer {
-                    override fun consume(response: TracksResponse) {
-                        if (searchIsNotCanceled){
-                            when (response.resultType) {
-                                ResultType.EMPTY -> tracksStateLiveData.postValue(
-                                    TracksState.Empty(
-                                        searchMessagesInteractor.getEmptyStateMessage()
-                                    )
-                                )
+            searchJob = viewModelScope.launch {
+                searchInteractor.searchTracks(expression).collect {
+                    when (it.resultType) {
+                        ResultType.EMPTY -> tracksStateLiveData.postValue(
+                            TracksState.Empty(
+                                searchMessagesInteractor.getEmptyStateMessage()
+                            )
+                        )
 
-                                ResultType.SUCCESS -> tracksStateLiveData.postValue(
-                                    TracksState.SearchContent(
-                                        response.tracks
-                                    )
-                                )
+                        ResultType.SUCCESS -> tracksStateLiveData.postValue(
+                            TracksState.SearchContent(
+                                it.tracks
+                            )
+                        )
 
-                                ResultType.CONNECTION -> tracksStateLiveData.postValue(
-                                    TracksState.Connection(
-                                        searchMessagesInteractor.getConnectionErrorMessage()
-                                    )
-                                )
+                        ResultType.CONNECTION -> tracksStateLiveData.postValue(
+                            TracksState.Connection(
+                                searchMessagesInteractor.getConnectionErrorMessage()
+                            )
+                        )
 
-                                ResultType.ERROR -> tracksStateLiveData.postValue(
-                                    TracksState.Error(
-                                        String.format(
-                                            searchMessagesInteractor.getErrorMessage(),
-                                            response.resultCode.toString()
-                                        )
-                                    )
+                        ResultType.ERROR -> tracksStateLiveData.postValue(
+                            TracksState.Error(
+                                String.format(
+                                    searchMessagesInteractor.getErrorMessage(),
+                                    it.resultCode.toString()
                                 )
-
-                            }
-                        } else onShowTracksHistory()
+                            )
+                        )
                     }
-                })
+                }
+            }
         }
+    }
+
+    fun cancelSearch(){
+        searchJob?.cancel()
     }
 
     fun onShowTracksHistory() {
@@ -118,13 +101,14 @@ class TracksViewModel(
         tracksStateLiveData.postValue(TracksState.HiddenHistory)
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        handler.removeCallbacksAndMessages(null)
+    fun searchDebounce(changedText: String) {
+        if (latestSearchText != changedText) {
+            latestSearchText = changedText
+            onSearchDebounce(changedText)
+        }
     }
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
-        private val SEARCH_REQUEST_TOKEN = Any()
     }
 }
