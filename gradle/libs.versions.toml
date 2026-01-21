@@ -15,6 +15,7 @@ junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 appcompat = "1.7.0"
+kotlinxCoroutinesCore = "1.6.4"
 lifecycleLivedataKtx = "2.9.4"
 material = "1.6.1"
 activity = "1.10.0"
@@ -27,6 +28,8 @@ retrofitVersion = "3.0.0"
 uiDesktop = "1.7.0"
 toolsCore = "1.0.0-alpha13"
 viewpager2 = "1.1.0"
+navigationFragmentKtxVersion = "2.9.6"
+navigationUiKtxVersion = "2.9.6"
 
 [libraries]
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
@@ -46,6 +49,8 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "j
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinAndroid" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesCore" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
@@ -57,6 +62,8 @@ retrofit-v300 = { module = "com.squareup.retrofit2:retrofit", version.ref = "ret
 retrofit2-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 androidx-ui-desktop = { group = "androidx.compose.ui", name = "ui-desktop", version.ref = "uiDesktop" }
 androidx-tools-core = { group = "androidx.privacysandbox.tools", name = "tools-core", version.ref = "toolsCore" }
+navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtxVersion" }
+androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtxVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

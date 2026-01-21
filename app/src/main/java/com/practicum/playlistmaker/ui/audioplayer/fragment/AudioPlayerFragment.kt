@@ -138,6 +138,5 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
 
         fun createArgs(track: TrackParcelable): Bundle =
             bundleOf(ARG_TRACK to track)
-
     }
 }

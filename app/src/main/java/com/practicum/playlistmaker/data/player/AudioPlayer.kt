@@ -1,27 +1,38 @@
 package com.practicum.playlistmaker.data.player
 
 import android.media.MediaPlayer
-import android.os.Handler
-import android.os.Looper
 import com.practicum.playlistmaker.domain.api.player.AudioPlayerEventListener
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AudioPlayer(var mediaPlayer: MediaPlayer) {
     private var playerState = PlayerState.STATE_DEFAULT
 
     private var listener: AudioPlayerEventListener? = null
-    private var mainThreadHandler = Handler(Looper.getMainLooper())
 
-    private var lastCurrentPosition = LAST_CURRENT_POSITION_DEFAULT
-
-    private val updateTimerTask = object : Runnable {
-        override fun run() {
+    private val scope = CoroutineScope(Dispatchers.Default)
+    private var updateTimerJob: Job? = null
+    private val positionFlow = flow {
+        while (mediaPlayer.isPlaying && playerState == PlayerState.STATE_PLAYING) {
             val currentPosition = mediaPlayer.currentPosition
-            if (currentPosition != lastCurrentPosition) {
-                listener?.onPlayerChangePosition(currentPosition)
-                lastCurrentPosition = currentPosition
-            }
-            if (playerState == PlayerState.STATE_PLAYING && mediaPlayer.isPlaying) {
-                mainThreadHandler.postDelayed(this, TIMER_UPDATE_DELAY)
+            emit(currentPosition)
+            delay(TIMER_UPDATE_DELAY)
+        }
+    }
+
+    fun startTimer() {
+        updateTimerJob?.cancel()
+        updateTimerJob = scope.launch {
+            withContext(Dispatchers.Main) {
+                positionFlow.distinctUntilChanged()
+                    .collect { positionFlow -> listener?.onPlayerChangePosition(positionFlow) }
             }
         }
     }
@@ -36,10 +47,9 @@ class AudioPlayer(var mediaPlayer: MediaPlayer) {
             playerState = PlayerState.STATE_PREPARED
         }
         mediaPlayer.setOnCompletionListener {
-            mainThreadHandler.removeCallbacks(updateTimerTask)
+            updateTimerJob?.cancel()
             listener?.onPlayerCompletion()
             playerState = PlayerState.STATE_PREPARED
-            lastCurrentPosition = LAST_CURRENT_POSITION_DEFAULT
         }
 
         mediaPlayer.setDataSource(dataSource)
@@ -48,8 +58,7 @@ class AudioPlayer(var mediaPlayer: MediaPlayer) {
 
     fun startPlayer() {
         mediaPlayer.start()
-        lastCurrentPosition = LAST_CURRENT_POSITION_DEFAULT
-        mainThreadHandler.post(updateTimerTask)
+        startTimer()
         playerState = PlayerState.STATE_PLAYING
         listener?.onPlayerStart()
     }
@@ -57,7 +66,7 @@ class AudioPlayer(var mediaPlayer: MediaPlayer) {
     fun pausePlayer() {
         if (mediaPlayer.isPlaying) {
             mediaPlayer.pause()
-            mainThreadHandler.removeCallbacks(updateTimerTask)
+            updateTimerJob?.cancel()
             playerState = PlayerState.STATE_PAUSED
             listener?.onPlayerPause()
         }
@@ -77,13 +86,13 @@ class AudioPlayer(var mediaPlayer: MediaPlayer) {
         }
     }
 
-    fun onRelease(){
-        mainThreadHandler.removeCallbacksAndMessages(null)
+    fun onRelease() {
+        updateTimerJob?.cancel()
+        scope.cancel()
         mediaPlayer.release()
     }
 
     companion object {
         private const val TIMER_UPDATE_DELAY = 300L
-        private const val LAST_CURRENT_POSITION_DEFAULT = -1
     }
 }

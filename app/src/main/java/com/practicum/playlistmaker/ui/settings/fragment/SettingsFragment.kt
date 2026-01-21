@@ -23,7 +23,7 @@ class SettingsFragment : BindingFragment<FragmentSettingsBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.themeSwitcher.setOnCheckedChangeListener { themeSwitcher, checked ->
+        binding.themeSwitcher.setOnCheckedChangeListener { _, checked ->
             viewModel.onSwitchTheme(checked)
         }
 
