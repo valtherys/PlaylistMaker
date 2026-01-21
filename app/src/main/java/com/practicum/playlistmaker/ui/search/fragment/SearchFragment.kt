@@ -2,13 +2,13 @@ package com.practicum.playlistmaker.ui.search.fragment
 
 import android.content.Context
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isGone
+import androidx.core.widget.doAfterTextChanged
+import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,7 +27,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class SearchFragment : BindingFragment<FragmentSearchBinding>() {
     private var query: String = QUERY_DEF
     private var tracksAdapter: TracksAdapter? = null
-    private var textWatcher: TextWatcher? = null
+
     private val viewModel: TracksViewModel by viewModel()
 
     private lateinit var onTrackClickDebounce: (Track) -> Unit
@@ -46,12 +46,14 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
             delayMillis = CLICK_DEBOUNCE_DELAY,
             coroutineScope = viewLifecycleOwner.lifecycleScope,
             useLastParam = false,
-            action = { track -> findNavController().navigate(
-                R.id.action_searchFragment_to_audioPlayerFragment,
-                AudioPlayerFragment.createArgs(track.toParcelable())
-            )
+            action = { track ->
+                findNavController().navigate(
+                    R.id.action_searchFragment_to_audioPlayerFragment,
+                    AudioPlayerFragment.createArgs(track.toParcelable())
+                )
 
-                viewModel.onTrackClicked(track) }
+                viewModel.onTrackClicked(track)
+            }
         )
 
         tracksAdapter = TracksAdapter { track ->
@@ -92,44 +94,23 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
             viewModel.onDeleteTracksHistory()
         }
 
-        textWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                // empty
-            }
+        binding.etSearch.doOnTextChanged { s, _, _, _ ->
+            viewModel.searchDebounce(s.toString())
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                viewModel.searchDebounce(s.toString())
-
-                binding.ivClear.visibility = clearButtonVisibility(s)
-                if (binding.ivClear.isGone) inputMethodManager?.hideSoftInputFromWindow(
-                    binding.etSearch.windowToken, 0
-                )
-                if (binding.etSearch.hasFocus() && s?.isEmpty() == true) {
-                    viewModel.onShowTracksHistory()
-                } else hideTracksHistory()
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                query = s.toString()
-            }
+            binding.ivClear.visibility = clearButtonVisibility(s)
+            if (binding.ivClear.isGone) inputMethodManager?.hideSoftInputFromWindow(
+                binding.etSearch.windowToken, 0
+            )
+            if (binding.etSearch.hasFocus() && s?.isEmpty() == true) {
+                viewModel.onShowTracksHistory()
+            } else hideTracksHistory()
         }
 
-        binding.etSearch.addTextChangedListener(textWatcher)
+        binding.etSearch.doAfterTextChanged { s -> query = s.toString() }
 
         viewModel.observeTracksStateLiveData().observe(viewLifecycleOwner) {
             render(it)
         }
-    }
-
-    override fun onDestroyView() {
-        tracksAdapter = null
-        binding.recyclerView.adapter = null
-        textWatcher?.let {
-            binding.etSearch.removeTextChangedListener(it)
-        }
-        textWatcher = null
-
-        super.onDestroyView() 
     }
 
     fun showLoader() {

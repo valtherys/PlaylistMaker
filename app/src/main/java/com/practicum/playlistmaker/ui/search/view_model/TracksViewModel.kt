@@ -34,10 +34,9 @@ class TracksViewModel(
     }
 
     fun onSearchRequested(expression: String) {
-        searchJob?.cancel()
         if (expression.isNotBlank()) {
             tracksStateLiveData.postValue(TracksState.Loading)
-
+            searchJob?.cancel()
             searchJob = viewModelScope.launch {
                 searchInteractor.searchTracks(expression).collect {
                     when (it.resultType) {
@@ -73,7 +72,7 @@ class TracksViewModel(
         }
     }
 
-    fun cancelSearch(){
+    fun cancelSearch() {
         searchJob?.cancel()
     }
 
