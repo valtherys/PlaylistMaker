@@ -5,7 +5,7 @@ import com.practicum.playlistmaker.domain.models.Track
 interface TracksHistoryInteractor {
     fun readTracksHistory()
 
-    fun getTracksFromHistory(consumer: TracksHistoryConsumer)
+    suspend fun getTracksFromHistory(consumer: TracksHistoryConsumer)
 
     fun saveTrackInHistory(track: Track)
 

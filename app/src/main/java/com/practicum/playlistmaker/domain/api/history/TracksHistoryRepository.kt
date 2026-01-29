@@ -7,7 +7,7 @@ interface TracksHistoryRepository {
 
     fun readTracksHistory()
 
-    fun getTracksHistory(): TracksHistory
+    suspend fun getTracksHistory(): TracksHistory
 
     fun saveTrackInHistory(track: Track)
 

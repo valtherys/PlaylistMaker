@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 class TracksViewModel(
     val searchInteractor: TracksSearchInteractor,
     val historyInteractor: TracksHistoryInteractor,
-    val searchMessagesInteractor: SearchMessagesInteractor
+    val searchMessagesInteractor: SearchMessagesInteractor,
 ) : ViewModel() {
     private val tracksStateLiveData = MutableLiveData<TracksState>()
     private var latestSearchText: String? = null
@@ -79,16 +79,18 @@ class TracksViewModel(
     fun onShowTracksHistory() {
         tracksStateLiveData.postValue(TracksState.HiddenHistory)
 
-        historyInteractor.getTracksFromHistory(object :
-            TracksHistoryInteractor.TracksHistoryConsumer {
-            override fun consume(tracks: List<Track>) {
-                if (tracks.isEmpty()) {
-                    tracksStateLiveData.postValue(TracksState.HiddenHistory)
-                } else {
-                    tracksStateLiveData.postValue(TracksState.HistoryContent(tracks.reversed()))
+        viewModelScope.launch {
+            historyInteractor.getTracksFromHistory(object :
+                TracksHistoryInteractor.TracksHistoryConsumer {
+                override fun consume(tracks: List<Track>) {
+                    if (tracks.isEmpty()) {
+                        tracksStateLiveData.postValue(TracksState.HiddenHistory)
+                    } else {
+                        tracksStateLiveData.postValue(TracksState.HistoryContent(tracks.reversed()))
+                    }
                 }
-            }
-        })
+            })
+        }
     }
 
     fun onTrackClicked(track: Track) {
@@ -106,7 +108,6 @@ class TracksViewModel(
             onSearchDebounce(changedText)
         }
     }
-
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }

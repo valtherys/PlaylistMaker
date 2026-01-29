@@ -13,5 +13,8 @@ fun Track.toParcelable(): TrackParcelable = TrackParcelable(
     releaseDate = releaseDate,
     primaryGenreName = primaryGenreName,
     country = country,
-    previewUrl = previewUrl
+    previewUrl = previewUrl,
+    isFavorite = isFavorite,
 )
+
+fun Track.toParcelableFavorite(): TrackParcelable = toParcelable().apply { isFavorite = true }

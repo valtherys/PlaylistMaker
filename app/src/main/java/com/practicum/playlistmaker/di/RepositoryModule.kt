@@ -1,5 +1,8 @@
 package com.practicum.playlistmaker.di
 
+import com.practicum.playlistmaker.data.mappers.TrackDbMapper
+import com.practicum.playlistmaker.data.mappers.TrackDtoMapper
+import com.practicum.playlistmaker.data.db.FavoritesRepositoryImpl
 import com.practicum.playlistmaker.data.history.TracksHistoryRepositoryImpl
 import com.practicum.playlistmaker.data.player.AudioPlayerRepositoryImpl
 import com.practicum.playlistmaker.data.search.SearchMessagesRepositoryImpl
@@ -7,6 +10,7 @@ import com.practicum.playlistmaker.data.search.TracksSearchRepositoryImpl
 import com.practicum.playlistmaker.data.settings.UserSettingsRepositoryImpl
 import com.practicum.playlistmaker.data.sharing.AppConfigRepositoryImpl
 import com.practicum.playlistmaker.data.sharing.ExternalNavigatorImpl
+import com.practicum.playlistmaker.domain.api.db.FavoritesRepository
 import com.practicum.playlistmaker.domain.api.history.TracksHistoryRepository
 import com.practicum.playlistmaker.domain.api.player.AudioPlayerRepository
 import com.practicum.playlistmaker.domain.api.search.SearchMessagesRepository
@@ -19,7 +23,7 @@ import org.koin.dsl.module
 
 val repositoryModule = module {
     factory<TracksHistoryRepository> {
-        TracksHistoryRepositoryImpl(get(TRACKS_CLIENT))
+        TracksHistoryRepositoryImpl(get(TRACKS_CLIENT), get(), get())
     }
 
     factory<AudioPlayerRepository> {
@@ -27,7 +31,7 @@ val repositoryModule = module {
     }
 
     factory<TracksSearchRepository> {
-        TracksSearchRepositoryImpl(get())
+        TracksSearchRepositoryImpl(get(), get(), get())
     }
 
     single<SearchMessagesRepository> {
@@ -44,5 +48,12 @@ val repositoryModule = module {
 
     factory<ExternalNavigator> {
         ExternalNavigatorImpl(androidContext())
+    }
+
+    factory { TrackDbMapper() }
+    factory { TrackDtoMapper() }
+
+    single<FavoritesRepository> {
+        FavoritesRepositoryImpl(get(), get())
     }
 }
