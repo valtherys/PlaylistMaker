@@ -46,12 +46,13 @@ class FavoriteTracksFragment : BindingFragment<FragmentSelectedTracksBinding>() 
         viewModel.observeFavorites().observe(viewLifecycleOwner) {
             render(it)
         }
+        viewModel.getFavoriteTracks()
     }
 
-    private fun showEmptyState(message: String) {
+    private fun showEmptyState(messageResId: Int) {
         binding.llPlaceholder.isVisible = true
         binding.recyclerView.isVisible = false
-        binding.tvComment.text = message
+        binding.tvComment.text = getString(messageResId)
     }
 
     private fun showContent(tracks: List<Track>) {
@@ -63,7 +64,7 @@ class FavoriteTracksFragment : BindingFragment<FragmentSelectedTracksBinding>() 
 
     private fun render(state: FavoritesState) {
         when (state) {
-            is FavoritesState.Empty -> showEmptyState(state.message)
+            is FavoritesState.Empty -> showEmptyState(state.messageResId)
             is FavoritesState.Content -> showContent(state.favoriteTracks)
         }
     }

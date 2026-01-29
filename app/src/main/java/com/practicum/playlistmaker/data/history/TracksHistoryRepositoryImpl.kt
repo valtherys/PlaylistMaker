@@ -1,6 +1,5 @@
 package com.practicum.playlistmaker.data.history
 
-import com.practicum.playlistmaker.data.db.AppDatabase
 import com.practicum.playlistmaker.data.dto.TrackDto
 import com.practicum.playlistmaker.data.mappers.TrackDtoMapper
 import com.practicum.playlistmaker.domain.api.history.TracksHistoryRepository
@@ -9,7 +8,6 @@ import com.practicum.playlistmaker.domain.models.TracksHistory
 
 class TracksHistoryRepositoryImpl(
     private val storage: StorageClient<List<TrackDto>>,
-    private val appDatabase: AppDatabase,
     private val trackDtoMapper: TrackDtoMapper,
 ) :
     TracksHistoryRepository {
@@ -20,9 +18,8 @@ class TracksHistoryRepositoryImpl(
     }
 
     override suspend fun getTracksHistory(): TracksHistory {
-        val favoriteTrackIds = appDatabase.trackDao().getTrackIds()
         try {
-            val tracks = convertFromTrackDto(tracksHistory, favoriteTrackIds)
+            val tracks = convertFromTrackDto(tracksHistory)
             return TracksHistory(tracks)
         } catch (e: Exception) {
             return TracksHistory(listOf())
@@ -49,12 +46,10 @@ class TracksHistoryRepositoryImpl(
     }
 
     private fun convertFromTrackDto(
-        tracks: List<TrackDto>,
-        favoriteTrackIds: List<String>
+        tracks: List<TrackDto>
     ): List<Track> {
         return tracks.map { track ->
             trackDtoMapper.map(track)
-                .apply { isFavorite = favoriteTrackIds.contains(track.trackId) }
         }
     }
 

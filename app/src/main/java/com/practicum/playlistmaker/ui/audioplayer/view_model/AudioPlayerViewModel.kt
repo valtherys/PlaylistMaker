@@ -25,7 +25,7 @@ class AudioPlayerViewModel(
         interactor.setStateListener(this)
         interactor.preparePlayer(previewUrl)
         checkTrackIsFavorite(trackId)
-        playerStateLiveData.value = PlayerState.TimeProgress(dateFormatter.format(0))
+        playerStateLiveData.value = PlayerState.TimeProgress(dateFormatter.format(INITIAL_PROGRESS))
     }
 
     override fun onPlayerPrepared() {
@@ -82,5 +82,9 @@ class AudioPlayerViewModel(
         super.onCleared()
         interactor.setStateListener(null)
         interactor.onRelease()
+    }
+
+    companion object{
+        private const val INITIAL_PROGRESS = 0
     }
 }

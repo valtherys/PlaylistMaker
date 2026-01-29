@@ -1,10 +1,9 @@
 package com.practicum.playlistmaker.data.search
 
-import com.practicum.playlistmaker.data.mappers.TrackDtoMapper
-import com.practicum.playlistmaker.data.db.AppDatabase
 import com.practicum.playlistmaker.data.dto.TrackDto
 import com.practicum.playlistmaker.data.dto.TracksSearchRequest
 import com.practicum.playlistmaker.data.dto.TracksSearchResponse
+import com.practicum.playlistmaker.data.mappers.TrackDtoMapper
 import com.practicum.playlistmaker.data.network.HttpStatusCodes
 import com.practicum.playlistmaker.domain.api.search.TracksSearchRepository
 import com.practicum.playlistmaker.domain.models.Track
@@ -15,7 +14,6 @@ import kotlinx.coroutines.flow.flow
 
 class TracksSearchRepositoryImpl(
     private val networkClient: NetworkClient,
-    private val appDatabase: AppDatabase,
     private val trackDtoMapper: TrackDtoMapper,
 ) :
     TracksSearchRepository {
@@ -24,12 +22,11 @@ class TracksSearchRepositoryImpl(
 
         when (response.resultCode) {
             in HttpStatusCodes.SUCCESS_MIN..HttpStatusCodes.SUCCESS_MAX -> {
-                val favoriteTrackIds = appDatabase.trackDao().getTrackIds()
                 val tracksRow = (response as TracksSearchResponse).results
                 if (tracksRow.isEmpty()) {
                     emit(TracksResponse(response.resultCode, listOf(), ResultType.EMPTY))
                 } else {
-                    val tracks = convertFromTrackDto(tracksRow, favoriteTrackIds)
+                    val tracks = convertFromTrackDto(tracksRow)
                     emit(TracksResponse(response.resultCode, tracks, ResultType.SUCCESS))
                 }
             }
@@ -47,12 +44,10 @@ class TracksSearchRepositoryImpl(
     }
 
     private fun convertFromTrackDto(
-        tracks: List<TrackDto>,
-        favoriteTrackIds: List<String>
+        tracks: List<TrackDto>
     ): List<Track> {
         return tracks.map { track ->
             trackDtoMapper.map(track)
-                .apply { isFavorite = favoriteTrackIds.contains(track.trackId) }
         }
     }
 }

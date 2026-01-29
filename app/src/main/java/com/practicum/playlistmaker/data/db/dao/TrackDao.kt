@@ -21,9 +21,6 @@ interface TrackDao {
     @Query("SELECT * FROM track_table")
     fun getTracks(): Flow<List<TrackEntity>>
 
-    @Query("SELECT trackId FROM track_table")
-    suspend fun getTrackIds(): List<String>
-
     @Query("SELECT trackId FROM track_table WHERE trackId = :trackIdPassed"  )
     fun findTrackInDb(trackIdPassed: String): Flow<String?>
 }
