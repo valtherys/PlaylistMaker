@@ -3,11 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.medialibrary.selected_tracks.fragment.SelectedTracksFragment">
+    tools:context=".ui.medialibrary.favorite_tracks.fragment.FavoriteTracksFragment">
 
     <LinearLayout
+        android:visibility="gone"
         android:id="@+id/ll_placeholder"
-        style="@style/Placeholder">
+        style="@style/Placeholder"
+>
 
         <ImageView
             android:id="@+id/iv_placeholder"
@@ -20,5 +22,11 @@
             style="@style/PlaceholderTextView"
             android:text="@string/empty_selected_tracks" />
     </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:visibility="gone"
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

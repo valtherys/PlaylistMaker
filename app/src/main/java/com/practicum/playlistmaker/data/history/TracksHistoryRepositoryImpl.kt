@@ -1,11 +1,15 @@
 package com.practicum.playlistmaker.data.history
 
 import com.practicum.playlistmaker.data.dto.TrackDto
-import com.practicum.playlistmaker.domain.models.TracksHistory
+import com.practicum.playlistmaker.data.mappers.TrackDtoMapper
 import com.practicum.playlistmaker.domain.api.history.TracksHistoryRepository
 import com.practicum.playlistmaker.domain.models.Track
+import com.practicum.playlistmaker.domain.models.TracksHistory
 
-class TracksHistoryRepositoryImpl(private val storage: StorageClient<List<TrackDto>>) :
+class TracksHistoryRepositoryImpl(
+    private val storage: StorageClient<List<TrackDto>>,
+    private val trackDtoMapper: TrackDtoMapper,
+) :
     TracksHistoryRepository {
     private var tracksHistory = mutableListOf<TrackDto>()
 
@@ -13,22 +17,9 @@ class TracksHistoryRepositoryImpl(private val storage: StorageClient<List<TrackD
         tracksHistory = storage.getData()?.toMutableList() ?: mutableListOf()
     }
 
-    override fun getTracksHistory(): TracksHistory {
+    override suspend fun getTracksHistory(): TracksHistory {
         try {
-            val tracks = tracksHistory.map {
-                Track(
-                    trackName = it.trackName,
-                    artistName = it.artistName,
-                    trackTime = it.trackTime,
-                    artworkUrl100 = it.artworkUrl100,
-                    trackId = it.trackId,
-                    collectionName = it.collectionName,
-                    releaseDate = it.releaseDate,
-                    primaryGenreName = it.primaryGenreName,
-                    country = it.country,
-                    previewUrl = it.previewUrl
-                )
-            }
+            val tracks = convertFromTrackDto(tracksHistory)
             return TracksHistory(tracks)
         } catch (e: Exception) {
             return TracksHistory(listOf())
@@ -36,18 +27,7 @@ class TracksHistoryRepositoryImpl(private val storage: StorageClient<List<TrackD
     }
 
     override fun saveTrackInHistory(track: Track) {
-        val trackDto = TrackDto(
-            trackName = track.trackName,
-            artistName = track.artistName,
-            trackTime = track.trackTime,
-            artworkUrl100 = track.artworkUrl100,
-            trackId = track.trackId,
-            collectionName = track.collectionName,
-            releaseDate = track.releaseDate,
-            primaryGenreName = track.primaryGenreName,
-            country = track.country,
-            previewUrl = track.previewUrl
-        )
+        val trackDto = trackDtoMapper.map(track)
         addTrackInTracksHistory(trackDto)
         storage.storeData(tracksHistory.toList())
     }
@@ -62,6 +42,14 @@ class TracksHistoryRepositoryImpl(private val storage: StorageClient<List<TrackD
         tracksHistory.add(track)
         if (tracksHistory.size > MAX_HISTORY_SIZE) {
             tracksHistory.removeAt(0)
+        }
+    }
+
+    private fun convertFromTrackDto(
+        tracks: List<TrackDto>
+    ): List<Track> {
+        return tracks.map { track ->
+            trackDtoMapper.map(track)
         }
     }
 

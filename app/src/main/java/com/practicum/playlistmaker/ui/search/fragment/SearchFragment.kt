@@ -18,7 +18,7 @@ import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.ui.audioplayer.fragment.AudioPlayerFragment
 import com.practicum.playlistmaker.ui.common.BindingFragment
 import com.practicum.playlistmaker.ui.mappers.toParcelable
-import com.practicum.playlistmaker.ui.search.adapters.TracksAdapter
+import com.practicum.playlistmaker.ui.common.adapters.TracksAdapter
 import com.practicum.playlistmaker.ui.search.view_model.TracksState
 import com.practicum.playlistmaker.ui.search.view_model.TracksViewModel
 import com.practicum.playlistmaker.utils.debounce
@@ -49,7 +49,8 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
             action = { track ->
                 findNavController().navigate(
                     R.id.action_searchFragment_to_audioPlayerFragment,
-                    AudioPlayerFragment.createArgs(track.toParcelable())
+                    AudioPlayerFragment.createArgs(track.toParcelable()
+                    )
                 )
 
                 viewModel.onTrackClicked(track)
@@ -111,6 +112,7 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
         viewModel.observeTracksStateLiveData().observe(viewLifecycleOwner) {
             render(it)
         }
+
     }
 
     fun showLoader() {

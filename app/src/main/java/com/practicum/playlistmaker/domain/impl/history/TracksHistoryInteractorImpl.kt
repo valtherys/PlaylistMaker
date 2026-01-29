@@ -10,7 +10,7 @@ class TracksHistoryInteractorImpl(private val repository: TracksHistoryRepositor
         repository.readTracksHistory()
     }
 
-    override fun getTracksFromHistory(consumer: TracksHistoryInteractor.TracksHistoryConsumer) {
+    override suspend fun getTracksFromHistory(consumer: TracksHistoryInteractor.TracksHistoryConsumer) {
         consumer.consume(repository.getTracksHistory().tracks)
     }
 

@@ -25,7 +25,7 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
     override val applyBottomInset = true
 
     private val albumCornerRadiusDp: Float = ALBUM_CORNER_RADIUS_DP
-    private val viewModel: AudioPlayerViewModel by viewModel { parametersOf(track?.previewUrl) }
+    private val viewModel: AudioPlayerViewModel by viewModel { parametersOf(track?.previewUrl, track?.trackId) }
 
     override fun createBinding(
         inflater: LayoutInflater,
@@ -59,6 +59,10 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
         binding.btnBack.setOnClickListener {
             findNavController().navigateUp()
         }
+
+        binding.btnAddToFavorites.setOnClickListener {
+            viewModel.onFavoriteClicked(track!!)
+        }
     }
 
     override fun onPause() {
@@ -83,6 +87,7 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
 
         hideViewGroupIfEmpty(track.collectionName, binding.groupAlbum, binding.tvAlbumData)
         hideViewGroupIfEmpty(track.getReleaseYear(), binding.groupYear, binding.tvYearData)
+        setFavoriteBtnImg(track.isFavorite)
     }
 
     private fun hideViewGroupIfEmpty(
@@ -121,6 +126,16 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
         }
     }
 
+    private fun setFavoriteBtnImg(isFavorite: Boolean) {
+        binding.btnAddToFavorites.setImageResource(
+            if (isFavorite) {
+                R.drawable.ic_remove_from_favorites_51
+            } else {
+                R.drawable.ic_add_to_favorites_51
+            }
+        )
+    }
+
     fun render(state: PlayerState) {
         when (state) {
             PlayerState.Default -> binding.btnPlay.isEnabled = false
@@ -129,6 +144,10 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
             PlayerState.Prepared -> onPlayerPrepared()
             PlayerState.Complete -> onPlayerCompletion()
             is PlayerState.TimeProgress -> onPlayerChangePosition(state.progress)
+            is PlayerState.Favorite -> {
+                track?.isFavorite = state.isFavorite
+                setFavoriteBtnImg(state.isFavorite)
+            }
         }
     }
 
