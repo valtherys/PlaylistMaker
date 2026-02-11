@@ -6,6 +6,7 @@ import androidx.room.Room
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.practicum.playlistmaker.data.db.AppDatabase
+import com.practicum.playlistmaker.data.db.dao.PlaylistDao
 import com.practicum.playlistmaker.data.db.dao.TrackDao
 import com.practicum.playlistmaker.data.dto.TrackDto
 import com.practicum.playlistmaker.data.history.PrefsStorageClient
@@ -67,10 +68,14 @@ val dataModule = module {
     factory { AudioPlayer(get()) }
 
     single {
-        Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db").build()
+        AppDatabase.buildDatabase(androidContext())
     }
 
     single<TrackDao> {
         get<AppDatabase>().trackDao()
+    }
+
+    single<PlaylistDao>{
+        get<AppDatabase>().playlistDao()
     }
 }

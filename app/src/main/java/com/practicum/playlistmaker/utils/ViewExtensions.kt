@@ -15,6 +15,7 @@ fun View.applySystemBarsPadding() {
 
     ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
         val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+
         v.setPaddingRelative(
             initialPaddingStart + systemBars.left,
             initialPaddingTop + systemBars.top,
@@ -67,5 +68,24 @@ fun TabLayout.setIndicatorMargins(indicatorMarginPx: Int) {
             params.marginStart = indicatorMarginPx
         }
         tabView.layoutParams = params
+    }
+}
+
+fun View.applySystemBarsImeInsets() {
+    val initialPaddingStart = paddingStart
+    val initialPaddingTop = paddingTop
+    val initialPaddingEnd = paddingEnd
+
+    ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+
+        val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+        val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+        v.setPaddingRelative(
+            initialPaddingStart + systemBars.left,
+            initialPaddingTop + systemBars.top,
+            initialPaddingEnd + systemBars.right,
+            maxOf(ime.bottom, systemBars.bottom)
+        )
+        insets
     }
 }

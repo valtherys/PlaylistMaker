@@ -4,6 +4,7 @@ import com.practicum.playlistmaker.ui.audioplayer.view_model.AudioPlayerViewMode
 import com.practicum.playlistmaker.ui.medialibrary.favorite_tracks.view_model.FavoriteTracksViewModel
 import com.practicum.playlistmaker.ui.medialibrary.playlists.view_model.PlaylistsViewModel
 import com.practicum.playlistmaker.ui.medialibrary.view_model.MediaLibraryViewModel
+import com.practicum.playlistmaker.ui.playlist_creation.view_model.PlaylistCreationViewModel
 import com.practicum.playlistmaker.ui.search.view_model.TracksViewModel
 import com.practicum.playlistmaker.ui.settings.view_model.UserSettingsViewModel
 import org.koin.core.module.dsl.viewModel
@@ -27,4 +28,5 @@ val viewModelModule = module {
     viewModel { MediaLibraryViewModel() }
     viewModel { PlaylistsViewModel() }
     viewModel { FavoriteTracksViewModel(get()) }
+    viewModel { PlaylistCreationViewModel(get()) }
 }

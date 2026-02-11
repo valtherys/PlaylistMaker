@@ -3,7 +3,9 @@ package com.practicum.playlistmaker.di
 import com.practicum.playlistmaker.data.mappers.TrackDbMapper
 import com.practicum.playlistmaker.data.mappers.TrackDtoMapper
 import com.practicum.playlistmaker.data.db.FavoritesRepositoryImpl
+import com.practicum.playlistmaker.data.db.PlaylistsRepositoryImpl
 import com.practicum.playlistmaker.data.history.TracksHistoryRepositoryImpl
+import com.practicum.playlistmaker.data.mappers.PlaylistDbMapper
 import com.practicum.playlistmaker.data.player.AudioPlayerRepositoryImpl
 import com.practicum.playlistmaker.data.search.SearchMessagesRepositoryImpl
 import com.practicum.playlistmaker.data.search.TracksSearchRepositoryImpl
@@ -11,6 +13,7 @@ import com.practicum.playlistmaker.data.settings.UserSettingsRepositoryImpl
 import com.practicum.playlistmaker.data.sharing.AppConfigRepositoryImpl
 import com.practicum.playlistmaker.data.sharing.ExternalNavigatorImpl
 import com.practicum.playlistmaker.domain.api.db.FavoritesRepository
+import com.practicum.playlistmaker.domain.api.db.PlaylistsRepository
 import com.practicum.playlistmaker.domain.api.history.TracksHistoryRepository
 import com.practicum.playlistmaker.domain.api.player.AudioPlayerRepository
 import com.practicum.playlistmaker.domain.api.search.SearchMessagesRepository
@@ -52,8 +55,13 @@ val repositoryModule = module {
 
     factory { TrackDbMapper() }
     factory { TrackDtoMapper() }
+    factory { PlaylistDbMapper() }
 
     single<FavoritesRepository> {
         FavoritesRepositoryImpl(get(), get())
+    }
+
+    single<PlaylistsRepository> {
+        PlaylistsRepositoryImpl(get(), get())
     }
 }

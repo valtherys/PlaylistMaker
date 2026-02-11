@@ -15,6 +15,8 @@
         <item name="iconTint">@color/YP_Black</item>
     </style>
 
+    <style name="UnelevatedBtn" parent="Widget.MaterialComponents.Button.UnelevatedButton" />
+
     <style name="TextViewTitle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -42,7 +44,6 @@
         <item name="android:layout_gravity">end|center_vertical</item>
         <item name="android:scaleType">centerCrop</item>
     </style>
-
 
 
     <style name="TextViewTrackFields">
@@ -100,6 +101,27 @@
         <item name="cornerRadius">54dp</item>
     </style>
 
+    <style name="TextInputLayoutPlaylistCreation" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">56dp</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="boxCornerRadiusBottomStart">8dp</item>
+        <item name="boxCornerRadiusBottomEnd">8dp</item>
+        <item name="boxCornerRadiusTopEnd">8dp</item>
+        <item name="boxCornerRadiusTopStart">8dp</item>
+        <item name="boxStrokeColor">@color/input_outline_selector</item>
+        <item name="hintTextColor">@color/input_hint_selector</item>
+        <item name="hintAnimationEnabled">true</item>
 
+    </style>
+
+    <style name="EditTextPlaylistCreation">
+        <item name="android:inputType">text</item>
+        <item name="android:autofillHints">no</item>
+        <item name="android:maxLength">60</item>
+        <item name="singleLine">true</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
 
 </resources>
