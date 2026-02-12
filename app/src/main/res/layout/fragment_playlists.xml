@@ -15,7 +15,8 @@
     <LinearLayout
         android:id="@+id/ll_placeholder"
         style="@style/Placeholder"
-        android:layout_marginTop="24dp">
+        android:layout_marginTop="24dp"
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/iv_placeholder"
@@ -28,5 +29,9 @@
             style="@style/PlaceholderTextView"
             android:text="@string/empty_playlists" />
     </LinearLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/playlists"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

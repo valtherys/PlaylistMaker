@@ -26,7 +26,7 @@ val viewModelModule = module {
     viewModel { UserSettingsViewModel(get(), get()) }
 
     viewModel { MediaLibraryViewModel() }
-    viewModel { PlaylistsViewModel() }
+    viewModel { PlaylistsViewModel(get()) }
     viewModel { FavoriteTracksViewModel(get()) }
     viewModel { PlaylistCreationViewModel(get()) }
 }

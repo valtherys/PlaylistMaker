@@ -32,7 +32,7 @@
             android:layout_height="0dp"
             android:layout_marginTop="26dp"
             android:contentDescription="@string/playlist_cover"
-            android:scaleType="fitCenter"
+            android:scaleType="centerCrop"
             android:src="@drawable/ic_playlist_cover_choose_320"
             app:layout_constraintBottom_toTopOf="@id/layout_playlist_name"
             app:layout_constraintDimensionRatio="h,1:1"

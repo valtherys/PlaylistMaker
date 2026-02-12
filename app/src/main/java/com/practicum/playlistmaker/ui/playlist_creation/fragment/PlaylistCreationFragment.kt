@@ -12,20 +12,26 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.net.toUri
 import androidx.core.widget.doAfterTextChanged
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.practicum.playlistmaker.databinding.FragmentPlaylistCreationBinding
 import com.practicum.playlistmaker.domain.models.Playlist
 import com.practicum.playlistmaker.ui.common.BindingFragment
 import com.practicum.playlistmaker.ui.playlist_creation.view_model.PlaylistCreationViewModel
+import com.practicum.playlistmaker.utils.dpToPx
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.io.FileOutputStream
 
 class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreationBinding>() {
     override val applyImeInset = true
-    private var coverUri: Uri? = null
+    private var coverUriSelected: Uri? = null
+    private var coverSaved: File? = null
 
     private val playlistName: String
         get() = binding.etPlaylistName.text.toString()
@@ -62,8 +68,8 @@ class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreationBindi
             registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
 
                 if (uri != null) {
-                    binding.playlistCover.setImageURI(uri)
-                    coverUri = uri
+                    loadCover(uri)
+                    coverUriSelected = uri
                 } else {
                     Log.d("PhotoPicker", "No media selected")
                 }
@@ -105,25 +111,26 @@ class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreationBindi
 
 
     private fun onCreatePlaylist() {
-        coverUri?.let {
+        coverUriSelected?.let {
             saveImageToPrivateStorage(it, playlistName)
-            viewModel.createPlaylist(
-                createPlaylistObj(it)
-            )
         }
+
+        viewModel.createPlaylist(
+            createPlaylistObj()
+        )
     }
 
     private fun handleBackAction() {
-        if (coverUri != null && playlistName.isNotBlank()) {
+        if (coverUriSelected != null && playlistName.isNotBlank()) {
             confirmDialog.show()
         } else findNavController().navigateUp()
     }
 
-    private fun createPlaylistObj(uri: Uri): Playlist {
+    private fun createPlaylistObj(): Playlist {
         return Playlist(
             playlistName = playlistName,
             playlistDescription = playlistDescription,
-            coverFilePath = uri.toString(),
+            coverFilePath = coverSaved?.toUri().toString(),
             trackIds = listOf(),
             tracksAmount = 0
         )
@@ -137,19 +144,28 @@ class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreationBindi
             filePath.mkdirs()
         }
 
-        val file = File(filePath, "${playlistName}.jpg")
+        val coverFile = File(filePath, "${playlistName}_${System.currentTimeMillis()}.jpg")
 
         requireContext().contentResolver.openInputStream(uri)?.use { inputStream ->
-            FileOutputStream(file).use { outputStream ->
+            FileOutputStream(coverFile).use { outputStream ->
                 BitmapFactory.decodeStream(inputStream)
                     .compress(Bitmap.CompressFormat.JPEG, IMAGE_QUALITY, outputStream)
             }
+            coverSaved = coverFile
         } ?: Log.e("SaveImage", "Failed to open input stream")
+    }
+
+    private fun loadCover(uri: Uri) {
+        val playlistCornerRadiusPx = requireContext().dpToPx(PLAYLIST_CORNER_RADIUS)
+        Glide.with(requireContext()).load(uri)
+            .transform(CenterCrop(), RoundedCorners(playlistCornerRadiusPx))
+            .into(binding.playlistCover)
     }
 
     companion object {
         private const val IMAGE_QUALITY = 100
         private const val COVERS_FOLDER_NAME = "playlist_covers"
+        private const val PLAYLIST_CORNER_RADIUS = 8f
     }
 }
 
