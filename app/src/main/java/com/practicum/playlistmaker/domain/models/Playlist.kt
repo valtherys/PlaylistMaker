@@ -7,5 +7,5 @@ data class Playlist(
     val playlistDescription: String?,
     val coverFilePath: String?,
     var trackIds: List<String>?,
-    var tracksAmount: Int = 0,
+    var tracksAmount: Int,
 )

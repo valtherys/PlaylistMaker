@@ -9,7 +9,7 @@
     <Button
         android:id="@+id/btn_create_new_playlist"
         style="@style/PlaceholderButton"
-        android:layout_marginTop="18dp"
+        android:layout_marginTop="0dp"
         android:text="@string/new_playlist"/>
 
     <LinearLayout
@@ -32,6 +32,6 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/playlists"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

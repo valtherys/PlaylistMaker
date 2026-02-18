@@ -6,6 +6,7 @@ import com.practicum.playlistmaker.data.db.FavoritesRepositoryImpl
 import com.practicum.playlistmaker.data.db.PlaylistsRepositoryImpl
 import com.practicum.playlistmaker.data.history.TracksHistoryRepositoryImpl
 import com.practicum.playlistmaker.data.mappers.PlaylistDbMapper
+import com.practicum.playlistmaker.data.mappers.PlaylistTrackDbMapper
 import com.practicum.playlistmaker.data.player.AudioPlayerRepositoryImpl
 import com.practicum.playlistmaker.data.search.SearchMessagesRepositoryImpl
 import com.practicum.playlistmaker.data.search.TracksSearchRepositoryImpl
@@ -56,12 +57,13 @@ val repositoryModule = module {
     factory { TrackDbMapper() }
     factory { TrackDtoMapper() }
     factory { PlaylistDbMapper() }
+    factory { PlaylistTrackDbMapper() }
 
     single<FavoritesRepository> {
         FavoritesRepositoryImpl(get(), get())
     }
 
     single<PlaylistsRepository> {
-        PlaylistsRepositoryImpl(get(), get())
+        PlaylistsRepositoryImpl(get(), get(), get(), get())
     }
 }

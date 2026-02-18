@@ -9,14 +9,14 @@ import com.practicum.playlistmaker.domain.models.Playlist
 import kotlinx.coroutines.launch
 
 class PlaylistCreationViewModel(private val interactor: PlaylistsInteractor) : ViewModel() {
-    private val _toastFlag: MutableLiveData<Boolean> = MutableLiveData(false)
-    fun observeToastFlag(): LiveData<Boolean> = _toastFlag
+    private val _playlistCreatedFlag: MutableLiveData<Boolean> = MutableLiveData(false)
+    fun observePlaylistCreationFlag(): LiveData<Boolean> = _playlistCreatedFlag
 
     fun createPlaylist(playlist: Playlist) {
         viewModelScope.launch {
-            val playlistId = interactor.addPlaylistToDb(playlist)
-            if (playlistId > 0) {
-                _toastFlag.postValue(true)
+            val addingIsSuccessful = interactor.addPlaylistToDb(playlist)
+            if (addingIsSuccessful) {
+                _playlistCreatedFlag.postValue(true)
             }
         }
     }

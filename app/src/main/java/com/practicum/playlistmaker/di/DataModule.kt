@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.practicum.playlistmaker.data.db.AppDatabase
 import com.practicum.playlistmaker.data.db.dao.PlaylistDao
+import com.practicum.playlistmaker.data.db.dao.PlaylistTrackDao
 import com.practicum.playlistmaker.data.db.dao.TrackDao
 import com.practicum.playlistmaker.data.dto.TrackDto
 import com.practicum.playlistmaker.data.history.PrefsStorageClient
@@ -74,7 +75,9 @@ val dataModule = module {
         get<AppDatabase>().trackDao()
     }
 
-    single<PlaylistDao>{
+    single<PlaylistDao> {
         get<AppDatabase>().playlistDao()
     }
+
+    single<PlaylistTrackDao> { get<AppDatabase>().playlistTrackDao() }
 }

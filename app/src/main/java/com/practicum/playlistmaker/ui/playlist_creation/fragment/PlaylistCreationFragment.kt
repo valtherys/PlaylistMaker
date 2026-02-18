@@ -8,10 +8,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat.getColor
 import androidx.core.net.toUri
 import androidx.core.widget.doAfterTextChanged
 import androidx.navigation.fragment.findNavController
@@ -19,9 +21,11 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlaylistCreationBinding
 import com.practicum.playlistmaker.domain.models.Playlist
 import com.practicum.playlistmaker.ui.common.BindingFragment
+import com.practicum.playlistmaker.ui.common.snackbar.CustomSnackbar
 import com.practicum.playlistmaker.ui.playlist_creation.view_model.PlaylistCreationViewModel
 import com.practicum.playlistmaker.utils.dpToPx
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -51,11 +55,11 @@ class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreationBindi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         confirmDialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Завершить создание плейлиста?")
-            .setMessage("Все несохраненные данные будут потеряны")
-            .setNeutralButton("Отмена") { _, _ ->
-            }.setPositiveButton("Завершить") { _, _ ->
-                onCreatePlaylist()
+            .setTitle(R.string.finish_playlist_creation)
+            .setMessage(R.string.unsaved_data_will_be_lost)
+            .setNeutralButton(R.string.cancel) { _, _ ->
+            }.setPositiveButton(R.string.finish) { _, _ ->
+                findNavController().navigateUp()
             }
     }
 
@@ -100,15 +104,13 @@ class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreationBindi
             }
         )
 
-        viewModel.observeToastFlag().observe(viewLifecycleOwner) {
+        viewModel.observePlaylistCreationFlag().observe(viewLifecycleOwner) {
             if (it) {
-                Toast.makeText(requireContext(), "Плейлист успешно создан", Toast.LENGTH_SHORT)
-                    .show()
+                showSnackbar()
                 findNavController().navigateUp()
             }
         }
     }
-
 
     private fun onCreatePlaylist() {
         coverUriSelected?.let {
@@ -121,8 +123,9 @@ class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreationBindi
     }
 
     private fun handleBackAction() {
-        if (coverUriSelected != null && playlistName.isNotBlank()) {
-            confirmDialog.show()
+        if (coverUriSelected != null && (playlistName.isNotBlank() || playlistDescription.isNotBlank())) {
+            val dialog = confirmDialog.show()
+            stileDialog(dialog)
         } else findNavController().navigateUp()
     }
 
@@ -162,10 +165,27 @@ class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreationBindi
             .into(binding.playlistCover)
     }
 
+    private fun showSnackbar() {
+        val text = getString(R.string.playlist_successfully_created)
+        CustomSnackbar(requireActivity().findViewById<LinearLayout>(R.id.main)).show(text)
+    }
+
+    private fun stileDialog(dialog: AlertDialog){
+        val buttonPadding = requireContext().dpToPx(BUTTON_PADDING_HORIZONTAL)
+        (dialog as AlertDialog).getButton(AlertDialog.BUTTON_NEUTRAL)
+            .setTextColor(getColor(requireContext(), R.color.YP_Blue))
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setPadding(buttonPadding,BUTTON_PADDING_VERTICAL, buttonPadding,BUTTON_PADDING_VERTICAL)
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            .setTextColor(getColor(requireContext(), R.color.YP_Blue))
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setPadding(buttonPadding,BUTTON_PADDING_VERTICAL, buttonPadding,BUTTON_PADDING_VERTICAL)
+    }
+
     companion object {
         private const val IMAGE_QUALITY = 100
         private const val COVERS_FOLDER_NAME = "playlist_covers"
         private const val PLAYLIST_CORNER_RADIUS = 8f
+        private const val BUTTON_PADDING_HORIZONTAL = 16f
+        private const val BUTTON_PADDING_VERTICAL = 0
     }
 }
 

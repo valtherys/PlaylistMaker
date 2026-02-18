@@ -37,11 +37,7 @@ class PlaylistsFragment : BindingFragment<FragmentPlaylistsBinding>() {
             findNavController().navigate(R.id.action_mediaLibraryFragment_to_playlistCreationFragment)
         }
 
-        viewmodel.observePlaylists().observe(viewLifecycleOwner) {
-            render(it)
-        }
-
-        viewmodel.onGetPlaylistsFromDb()
+        viewmodel.playlistsLiveData.observe(viewLifecycleOwner) { render(it) }
     }
 
     private fun render(state: PlaylistsState) {

@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.ui.medialibrary.playlists.adapters
+package com.practicum.playlistmaker.ui.audioplayer.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -9,32 +9,39 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.databinding.ItemPlaylistBinding
+import com.practicum.playlistmaker.databinding.ItemPlaylistBottomSheetBinding
 import com.practicum.playlistmaker.domain.models.Playlist
 import com.practicum.playlistmaker.utils.dpToPx
 
-class PlaylistsAdapter() : ListAdapter<Playlist, PlaylistsAdapter.PlaylistsViewHolder>(
-    PlaylistDiffCallback()
-) {
+
+class PlaylistsBottomSheetAdapter(private val onItemClick: (Playlist) -> Unit) :
+    ListAdapter<Playlist, PlaylistsBottomSheetAdapter.PlaylistsBottomSheetViewHolder>(
+        PlaylistBottomSheetDiffCallback()
+    ) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): PlaylistsViewHolder {
+    ): PlaylistsBottomSheetViewHolder {
         val binding =
-            ItemPlaylistBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return PlaylistsViewHolder(binding)
+            ItemPlaylistBottomSheetBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
+        return PlaylistsBottomSheetViewHolder(binding)
     }
 
     override fun onBindViewHolder(
-        holder: PlaylistsViewHolder,
+        holder: PlaylistsBottomSheetViewHolder,
         position: Int
     ) {
         val playlist = getItem(position)
         holder.bind(playlist)
+        holder.binding.root.setOnClickListener { onItemClick(playlist) }
     }
 
 
-    class PlaylistsViewHolder(val binding: ItemPlaylistBinding) :
+    class PlaylistsBottomSheetViewHolder(val binding: ItemPlaylistBottomSheetBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         private val playlistCornerRadiusPx = itemView.context.dpToPx(PLAYLIST_CORNER_RADIUS)
@@ -44,7 +51,10 @@ class PlaylistsAdapter() : ListAdapter<Playlist, PlaylistsAdapter.PlaylistsViewH
 
             binding.apply {
                 etPlaylistName.text = model.playlistName
-                etPlaylistDescription.text = itemView.context.resources.getQuantityString(R.plurals.track_count, model.tracksAmount).format(model.tracksAmount)
+                etPlaylistDescription.text = itemView.context.resources.getQuantityString(
+                    R.plurals.track_count,
+                    model.tracksAmount
+                ).format(model.tracksAmount)
 
                 Glide.with(itemView).load(playlistCoverUri)
                     .placeholder(R.drawable.ic_placeholder_45)
@@ -55,7 +65,7 @@ class PlaylistsAdapter() : ListAdapter<Playlist, PlaylistsAdapter.PlaylistsViewH
         }
     }
 
-    class PlaylistDiffCallback : DiffUtil.ItemCallback<Playlist>() {
+    class PlaylistBottomSheetDiffCallback : DiffUtil.ItemCallback<Playlist>() {
         override fun areItemsTheSame(oldItem: Playlist, newItem: Playlist): Boolean {
             return oldItem.playlistId == newItem.playlistId
         }
@@ -66,8 +76,7 @@ class PlaylistsAdapter() : ListAdapter<Playlist, PlaylistsAdapter.PlaylistsViewH
     }
 
     companion object {
-        private const val PLAYLIST_CORNER_RADIUS = 8f
+        private const val PLAYLIST_CORNER_RADIUS = 2f
     }
-
 }
 
