@@ -60,7 +60,6 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
 
         val albumCornerRadiusPx = requireContext().dpToPx(albumCornerRadiusDp)
         bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
-        Log.d("BottomSheetBaehav", "${bottomSheetBehavior.state}")
         bottomSheetController = BottomSheetController(bottomSheetBehavior, binding.dimView)
         bottomSheetController.init()
 

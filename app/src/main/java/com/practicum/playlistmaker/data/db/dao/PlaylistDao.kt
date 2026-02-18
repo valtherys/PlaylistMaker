@@ -20,7 +20,4 @@ interface PlaylistDao {
 
     @Query("DELETE FROM playlist_table")
     suspend fun deleteAll()
-
-    @Query("SELECT trackIds FROM playlist_table WHERE playlistId = :playlistIdPassed")
-    suspend fun getPlaylistTracks(playlistIdPassed: Int): String?
 }

@@ -44,7 +44,6 @@ class AudioPlayerViewModel(
     fun observeBottomSheetState(): LiveData<Boolean> = _bottomSheetIsVisible
 
     init {
-//        viewModelScope.launch {         playlistsDbInteractor.deletePlaylists() }
         audioPlayerInteractor.setStateListener(this)
         audioPlayerInteractor.preparePlayer(track.previewUrl)
         checkTrackIsFavorite(track.trackId)
