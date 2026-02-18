@@ -1,8 +1,5 @@
 package com.practicum.playlistmaker.ui.audioplayer.view_model
 
-import androidx.annotation.StringRes
-import com.practicum.playlistmaker.domain.models.Playlist
-
 sealed interface PlayerState {
     object Default : PlayerState
     object Prepared : PlayerState
