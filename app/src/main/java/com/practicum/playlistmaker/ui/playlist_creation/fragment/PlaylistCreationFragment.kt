@@ -1,7 +1,5 @@
 package com.practicum.playlistmaker.ui.playlist_creation.fragment
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -30,7 +28,6 @@ import com.practicum.playlistmaker.ui.playlist_creation.view_model.PlaylistCreat
 import com.practicum.playlistmaker.utils.dpToPx
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
-import java.io.FileOutputStream
 
 class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreationBinding>() {
     override val applyImeInset = true
@@ -110,11 +107,19 @@ class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreationBindi
                 findNavController().navigateUp()
             }
         }
+
+        viewModel.observeSavedCover().observe(viewLifecycleOwner){
+            it?.let {
+                coverSaved = it
+                viewModel.createPlaylist(createPlaylistObj())
+            }
+        }
     }
 
     private fun onCreatePlaylist() {
         coverUriSelected?.let {
-            saveImageToPrivateStorage(it, playlistName)
+            viewModel.saveImageIntoStorage(it, playlistName)
+            return
         }
 
         viewModel.createPlaylist(
@@ -139,24 +144,6 @@ class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreationBindi
         )
     }
 
-    private fun saveImageToPrivateStorage(uri: Uri, playlistName: String) {
-
-        val filePath = File(requireContext().filesDir, COVERS_FOLDER_NAME)
-
-        if (!filePath.exists()) {
-            filePath.mkdirs()
-        }
-
-        val coverFile = File(filePath, "${playlistName}_${System.currentTimeMillis()}.jpg")
-
-        requireContext().contentResolver.openInputStream(uri)?.use { inputStream ->
-            FileOutputStream(coverFile).use { outputStream ->
-                BitmapFactory.decodeStream(inputStream)
-                    .compress(Bitmap.CompressFormat.JPEG, IMAGE_QUALITY, outputStream)
-            }
-            coverSaved = coverFile
-        } ?: Log.e("SaveImage", "Failed to open input stream")
-    }
 
     private fun loadCover(uri: Uri) {
         val playlistCornerRadiusPx = requireContext().dpToPx(PLAYLIST_CORNER_RADIUS)
@@ -181,8 +168,6 @@ class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreationBindi
     }
 
     companion object {
-        private const val IMAGE_QUALITY = 100
-        private const val COVERS_FOLDER_NAME = "playlist_covers"
         private const val PLAYLIST_CORNER_RADIUS = 8f
         private const val BUTTON_PADDING_HORIZONTAL = 16f
         private const val BUTTON_PADDING_VERTICAL = 0

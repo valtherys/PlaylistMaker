@@ -15,6 +15,7 @@ import com.practicum.playlistmaker.data.network.ITunesApiService
 import com.practicum.playlistmaker.data.network.RetrofitNetworkClient
 import com.practicum.playlistmaker.data.player.AudioPlayer
 import com.practicum.playlistmaker.data.search.NetworkClient
+import com.practicum.playlistmaker.data.storage.ImageStorage
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -80,4 +81,6 @@ val dataModule = module {
     }
 
     single<PlaylistTrackDao> { get<AppDatabase>().playlistTrackDao() }
+
+    single{ ImageStorage(androidContext()) }
 }

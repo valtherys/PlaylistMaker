@@ -8,6 +8,7 @@ import com.practicum.playlistmaker.domain.api.db.PlaylistsRepository
 import com.practicum.playlistmaker.domain.models.Playlist
 import com.practicum.playlistmaker.ui.models.TrackParcelable
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
 class PlaylistsRepositoryImpl(
@@ -37,7 +38,7 @@ class PlaylistsRepositoryImpl(
     }
 
     override fun getPlaylists(): Flow<List<Playlist>?> =
-        playlistDao.getPlaylists()
+        playlistDao.getPlaylists().distinctUntilChanged()
             .map { playlists -> playlists?.map { playlist -> playlistDbMapper.map(playlist) } }
 
     override suspend fun deleteTable() {
