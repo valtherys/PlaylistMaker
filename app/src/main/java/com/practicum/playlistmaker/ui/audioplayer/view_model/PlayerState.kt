@@ -7,5 +7,5 @@ sealed interface PlayerState {
     object Paused : PlayerState
     object Complete : PlayerState
     data class TimeProgress(val progress: String) : PlayerState
-    data class Favorite(val isFavorite: Boolean = false): PlayerState
+    data class Favorite(val isFavorite: Boolean = false) : PlayerState
 }

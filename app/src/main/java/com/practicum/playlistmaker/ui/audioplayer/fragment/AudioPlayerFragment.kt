@@ -1,20 +1,30 @@
 package com.practicum.playlistmaker.ui.audioplayer.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.Group
 import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentAudioPlayerBinding
+import com.practicum.playlistmaker.domain.models.Playlist
+import com.practicum.playlistmaker.ui.audioplayer.adapters.PlaylistsBottomSheetAdapter
+import com.practicum.playlistmaker.ui.audioplayer.controller.BottomSheetController
 import com.practicum.playlistmaker.ui.audioplayer.view_model.AudioPlayerViewModel
 import com.practicum.playlistmaker.ui.audioplayer.view_model.PlayerState
+import com.practicum.playlistmaker.ui.audioplayer.view_model.PlaylistsState
+import com.practicum.playlistmaker.ui.audioplayer.view_model.TrackEvents
 import com.practicum.playlistmaker.ui.common.BindingFragment
+import com.practicum.playlistmaker.ui.common.snackbar.CustomSnackbar
 import com.practicum.playlistmaker.ui.models.TrackParcelable
 import com.practicum.playlistmaker.utils.dpToPx
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -23,9 +33,15 @@ import org.koin.core.parameter.parametersOf
 class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
     private var track: TrackParcelable? = null
     override val applyBottomInset = true
-
+    private lateinit var playlistsAdapter: PlaylistsBottomSheetAdapter
     private val albumCornerRadiusDp: Float = ALBUM_CORNER_RADIUS_DP
-    private val viewModel: AudioPlayerViewModel by viewModel { parametersOf(track?.previewUrl, track?.trackId) }
+    private val viewModel: AudioPlayerViewModel by viewModel {
+        parametersOf(
+            track,
+        )
+    }
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+    private lateinit var bottomSheetController: BottomSheetController
 
     override fun createBinding(
         inflater: LayoutInflater,
@@ -43,6 +59,14 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         val albumCornerRadiusPx = requireContext().dpToPx(albumCornerRadiusDp)
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
+        bottomSheetController = BottomSheetController(bottomSheetBehavior, binding.dimView)
+        bottomSheetController.init()
+
+        playlistsAdapter =
+            PlaylistsBottomSheetAdapter { playlist -> viewModel.onPlaylistClicked(playlist) }
+        binding.playlists.adapter = playlistsAdapter
+        binding.playlists.layoutManager = LinearLayoutManager(requireContext())
 
         track?.let {
             bindData(it, albumCornerRadiusPx)
@@ -52,10 +76,6 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
             viewModel.onPlayClicked()
         }
 
-        viewModel.observePlayerState().observe(viewLifecycleOwner) {
-            render(it)
-        }
-
         binding.btnBack.setOnClickListener {
             findNavController().navigateUp()
         }
@@ -63,6 +83,30 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
         binding.btnAddToFavorites.setOnClickListener {
             viewModel.onFavoriteClicked(track!!)
         }
+
+        binding.btnAddToLibrary.setOnClickListener {
+            onAddToPlaylistClicked()
+        }
+
+        binding.dimView.setOnClickListener {
+            viewModel.hideBottomSheet()
+        }
+
+        binding.btnCreateNewPlaylist.setOnClickListener {
+            viewModel.hideBottomSheet()
+            findNavController().navigate(R.id.action_audioPlayerFragment_to_playlistCreationFragment)
+        }
+
+        viewModel.observePlayerState().observe(viewLifecycleOwner) { renderPlayer(it) }
+        viewModel.playlistsStateLiveData.observe(viewLifecycleOwner) { renderPlaylists(it) }
+        viewModel.observeTrackEvents().observe(viewLifecycleOwner) { event ->
+            event.getContentIfNotHandled()?.let {
+                processEvents(it)
+            }
+        }
+        viewModel.observeBottomSheetState()
+            .observe(viewLifecycleOwner) { bottomSheetController.toggleBottomSheet(it) }
+        viewModel.checkTrackIsFavorite(track?.trackId!!)
     }
 
     override fun onPause() {
@@ -136,7 +180,29 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
         )
     }
 
-    fun render(state: PlayerState) {
+    private fun showPlaylists(playlists: List<Playlist>) {
+        playlistsAdapter.submitList(playlists)
+    }
+
+    private fun showEmptyState() {
+        playlistsAdapter.submitList(listOf())
+    }
+
+    private fun showSnackbar(playlistName: String, messageResource: Int) {
+        val text = requireContext().getString(messageResource).format(playlistName)
+        CustomSnackbar(requireActivity().findViewById<LinearLayout>(R.id.main)).show(text)
+    }
+
+    private fun onAddToPlaylistClicked() {
+        viewModel.openBottomSheet()
+    }
+
+    private fun handleTrackAdded(playlistName: String, messageResource: Int) {
+        viewModel.hideBottomSheet()
+        showSnackbar(playlistName, messageResource)
+    }
+
+    private fun renderPlayer(state: PlayerState) {
         when (state) {
             PlayerState.Default -> binding.btnPlay.isEnabled = false
             PlayerState.Paused -> onPlayerPause()
@@ -148,6 +214,22 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
                 track?.isFavorite = state.isFavorite
                 setFavoriteBtnImg(state.isFavorite)
             }
+        }
+    }
+
+    private fun renderPlaylists(state: PlaylistsState) {
+        when (state) {
+            PlaylistsState.Empty -> showEmptyState()
+            is PlaylistsState.Playlists -> {
+                showPlaylists(state.playlists)
+            }
+        }
+    }
+
+    private fun processEvents(state: TrackEvents) {
+        when (state) {
+            is TrackEvents.TrackAdded -> handleTrackAdded(state.playlistName, state.message)
+            is TrackEvents.TrackAlreadyAdded -> showSnackbar(state.playlistName, state.message)
         }
     }
 

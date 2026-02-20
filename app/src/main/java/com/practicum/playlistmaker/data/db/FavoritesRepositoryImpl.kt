@@ -6,6 +6,7 @@ import com.practicum.playlistmaker.domain.api.db.FavoritesRepository
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.ui.models.TrackParcelable
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
 class FavoritesRepositoryImpl(
@@ -23,11 +24,11 @@ class FavoritesRepositoryImpl(
     }
 
     override fun getFavoriteTracks(): Flow<List<Track>> = trackDao
-        .getTracks()
+        .getTracks().distinctUntilChanged()
         .map { list -> list.map { trackDbMapper.map(it) } }
 
     override fun checkTrackIsFavorite(trackId: String): Flow<String?> {
-        return trackDao.findTrackInDb(trackId)
+        return trackDao.findTrackInDb(trackId).distinctUntilChanged()
     }
 
 }

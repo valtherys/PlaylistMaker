@@ -31,6 +31,7 @@ toolsCore = "1.0.0-alpha13"
 viewpager2 = "1.1.0"
 navigationFragmentKtxVersion = "2.9.6"
 navigationUiKtxVersion = "2.9.6"
+legacySupportV4 = "1.0.0"
 
 [libraries]
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
@@ -68,6 +69,7 @@ androidx-ui-desktop = { group = "androidx.compose.ui", name = "ui-desktop", vers
 androidx-tools-core = { group = "androidx.privacysandbox.tools", name = "tools-core", version.ref = "toolsCore" }
 navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtxVersion" }
 androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtxVersion" }
+androidx-legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "legacySupportV4" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
