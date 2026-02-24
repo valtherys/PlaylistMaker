@@ -13,9 +13,10 @@ import com.practicum.playlistmaker.databinding.ItemPlaylistBinding
 import com.practicum.playlistmaker.domain.models.Playlist
 import com.practicum.playlistmaker.utils.dpToPx
 
-class PlaylistsAdapter() : ListAdapter<Playlist, PlaylistsAdapter.PlaylistsViewHolder>(
-    PlaylistDiffCallback()
-) {
+class PlaylistsAdapter(private val onItemClick: (Playlist) -> Unit) :
+    ListAdapter<Playlist, PlaylistsAdapter.PlaylistsViewHolder>(
+        PlaylistDiffCallback()
+    ) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -31,6 +32,9 @@ class PlaylistsAdapter() : ListAdapter<Playlist, PlaylistsAdapter.PlaylistsViewH
     ) {
         val playlist = getItem(position)
         holder.bind(playlist)
+        holder.binding.root.setOnClickListener {
+            onItemClick(playlist)
+        }
     }
 
 
@@ -44,7 +48,10 @@ class PlaylistsAdapter() : ListAdapter<Playlist, PlaylistsAdapter.PlaylistsViewH
 
             binding.apply {
                 etPlaylistName.text = model.playlistName
-                etPlaylistDescription.text = itemView.context.resources.getQuantityString(R.plurals.track_count, model.tracksAmount).format(model.tracksAmount)
+                etPlaylistDescription.text = itemView.context.resources.getQuantityString(
+                    R.plurals.track_count,
+                    model.tracksAmount
+                ).format(model.tracksAmount)
 
                 Glide.with(itemView).load(playlistCoverUri)
                     .placeholder(R.drawable.ic_placeholder_45)

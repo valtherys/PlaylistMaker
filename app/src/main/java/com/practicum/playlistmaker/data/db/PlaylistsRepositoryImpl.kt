@@ -6,6 +6,7 @@ import com.practicum.playlistmaker.data.mappers.PlaylistDbMapper
 import com.practicum.playlistmaker.data.mappers.PlaylistTrackDbMapper
 import com.practicum.playlistmaker.domain.api.db.PlaylistsRepository
 import com.practicum.playlistmaker.domain.models.Playlist
+import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.ui.models.TrackParcelable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -45,8 +46,40 @@ class PlaylistsRepositoryImpl(
         playlistDao.deleteAll()
     }
 
+    override fun getPlaylist(id: Int): Flow<Playlist> {
+        return playlistDao.getPlaylist(id).distinctUntilChanged()
+    }
+
+    override fun getPlaylistTracks(ids: List<String>): Flow<List<Track>> {
+        val tracksEntity = playlistTrackDao.getPlaylistTracks(ids).distinctUntilChanged()
+        val tracks =
+            tracksEntity.map { tracks -> tracks.map { track -> playlistTrackDbMapper.map(track) } }
+        return tracks
+    }
+
+    suspend fun deleteTrack(track: Track): Boolean {
+        val trackEntity = playlistTrackDbMapper.map(track)
+        val res = playlistTrackDao.deleteTrack(trackEntity)
+        return (res > ROWS_UNUPDATED)
+    }
+
+    override suspend fun deleteTrackFromPlaylist(track: Track, playlist: Playlist): Boolean {
+        val updatedPlaylist = playlist.copy(
+            trackIds = playlist.trackIds?.filter { it != track.trackId },
+            tracksAmount = (playlist.trackIds?.size ?: 0) - 1
+        )
+        val playlistEntity = playlistDbMapper.map(updatedPlaylist)
+        val playlistsWithTrack = playlistDao.countPlaylistsContainingTrack(track.trackId)
+        if (playlistsWithTrack == ONE_PLAYLIST_WITH_TRACK) {
+            deleteTrack(track)
+        }
+        val res = playlistDao.updatePlaylist(playlistEntity)
+        return (res > ROWS_UNUPDATED)
+    }
+
     companion object {
         private const val ROWS_UNUPDATED = 0
+        private const val ONE_PLAYLIST_WITH_TRACK = 1
         private const val INSERT_CONFLICT = -1f
     }
 }
