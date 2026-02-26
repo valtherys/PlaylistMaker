@@ -4,58 +4,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.core.view.updatePadding
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.textfield.TextInputEditText
 
-fun View.applySystemBarsPadding() {
-    val initialPaddingStart = paddingStart
-    val initialPaddingTop = paddingTop
-    val initialPaddingEnd = paddingEnd
-    val initialPaddingBottom = paddingBottom
-
-    ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
-        val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-
-        v.setPaddingRelative(
-            initialPaddingStart + systemBars.left,
-            initialPaddingTop + systemBars.top,
-            initialPaddingEnd + systemBars.right,
-            initialPaddingBottom + systemBars.bottom
-        )
-        insets
-    }
-}
-
-fun View.applySystemBarsPaddingExceptBottom() {
-    val initialPaddingStart = paddingStart
-    val initialPaddingTop = paddingTop
-    val initialPaddingEnd = paddingEnd
-
-    ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
-        val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-        v.setPaddingRelative(
-            initialPaddingStart + systemBars.left,
-            initialPaddingTop + systemBars.top,
-            initialPaddingEnd + systemBars.right,
-            0
-        )
-        insets
-    }
-}
-
-fun BottomNavigationView.applyBottomNavViewPadding() {
-    ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
-        val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-        v.setPaddingRelative(
-            0,
-            0,
-            0,
-            systemBars.bottom
-        )
-        insets
-    }
-}
 
 fun TabLayout.setIndicatorMargins(indicatorMarginPx: Int) {
     val tabStrip = this.getChildAt(0) as ViewGroup
@@ -72,33 +24,19 @@ fun TabLayout.setIndicatorMargins(indicatorMarginPx: Int) {
     }
 }
 
-fun View.applySystemBarsImeInsets() {
-    val originalPaddingTop = paddingTop
-    val originalPaddingBottom = paddingBottom
-    val originalPaddingStart = paddingStart
-    val originalPaddingEnd = paddingEnd
-
+fun View.setImeInsetsWithFocus() {
     var insetBottom = 0
 
     ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
-        val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
         val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
         insetBottom = if (ime.bottom > 0) {
-            originalPaddingBottom + ime.bottom
-        } else {
-            originalPaddingBottom + systemBars.bottom
-        }
+            ime.bottom
+        } else 0
 
-        view.setPaddingRelative(
-            originalPaddingStart + systemBars.left,
-            originalPaddingTop + systemBars.top,
-            originalPaddingEnd + systemBars.right,
-            insetBottom
-        )
+        view.updatePadding(bottom = ime.bottom)
 
         insets
     }
-
     viewTreeObserver.addOnGlobalLayoutListener {
         val focused = findFocus()
         if (focused is TextInputEditText) {

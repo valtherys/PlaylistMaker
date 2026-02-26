@@ -31,7 +31,6 @@ import org.koin.core.parameter.parametersOf
 
 class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
     private var track: TrackParcelable? = null
-    override val applyBottomInset = true
     private lateinit var playlistsAdapter: PlaylistsBottomSheetAdapter
     private val albumCornerRadiusDp: Float = ALBUM_CORNER_RADIUS_DP
     private val viewModel: AudioPlayerViewModel by viewModel {
