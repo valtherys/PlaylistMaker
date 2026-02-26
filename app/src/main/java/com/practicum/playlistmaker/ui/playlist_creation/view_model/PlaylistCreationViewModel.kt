@@ -11,29 +11,25 @@ import com.practicum.playlistmaker.domain.models.Playlist
 import kotlinx.coroutines.launch
 import java.io.File
 
-class PlaylistCreationViewModel(
+open class PlaylistCreationViewModel(
     private val playlistsInteractor: PlaylistsInteractor,
     private val imageStorageInteractor: ImageStorageInteractor
 ) : ViewModel() {
-    private val _playlistCreatedFlag: MutableLiveData<Boolean> = MutableLiveData(false)
-    fun observePlaylistCreationFlag(): LiveData<Boolean> = _playlistCreatedFlag
+    protected val playlistUpdateSuccessful = MutableLiveData(false)
+    fun observePlaylistUpdated(): LiveData<Boolean> = playlistUpdateSuccessful
+    protected val savedCover: MutableLiveData<File?> = MutableLiveData(null)
+    fun observeSavedCover() = savedCover
 
-    private val _savedCover: MutableLiveData<File?> = MutableLiveData(null)
-    fun observeSavedCover() = _savedCover
-
-    fun createPlaylist(playlist: Playlist) {
+    fun updatePlaylist(playlist: Playlist) {
         viewModelScope.launch {
-            val addingIsSuccessful = playlistsInteractor.addPlaylistToDb(playlist)
-            if (addingIsSuccessful) {
-                _playlistCreatedFlag.postValue(true)
-            }
+            playlistUpdateSuccessful.value = playlistsInteractor.addPlaylistToDb(playlist)
         }
     }
 
     fun saveImageIntoStorage(uri: Uri, playlistName: String) {
         viewModelScope.launch {
             val coverFile = imageStorageInteractor.saveImageToPrivateStorage(uri, playlistName)
-            _savedCover.value = coverFile
+            savedCover.value = coverFile
         }
     }
 }

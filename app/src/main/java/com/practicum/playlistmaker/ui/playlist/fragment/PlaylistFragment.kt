@@ -29,6 +29,7 @@ import com.practicum.playlistmaker.ui.playlist.adapter.TracksBottomSheetAdapter
 import com.practicum.playlistmaker.ui.playlist.view_model.PlaylistState
 import com.practicum.playlistmaker.ui.playlist.view_model.PlaylistTracksState
 import com.practicum.playlistmaker.ui.playlist.view_model.PlaylistViewModel
+import com.practicum.playlistmaker.ui.playlist_editing.fragment.PlaylistEditingFragment
 import com.practicum.playlistmaker.utils.dpToPx
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -92,6 +93,14 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
             onShareClicked()
         }
 
+        binding.tvEditInfo.setOnClickListener {
+            viewModel.hideBottomSheet()
+            findNavController().navigate(
+                R.id.action_playlistFragment_to_playlistEditingFragment,
+                PlaylistEditingFragment.createArgs(playlistId)
+            )
+        }
+
         binding.tvOptionDelete.setOnClickListener {
             viewModel.hideBottomSheet()
             showDeletePlaylistDialog()
@@ -133,8 +142,10 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
                 tvPlaylistName.text = playlist.playlistName
                 if (playlist.playlistDescription.isNullOrEmpty()) {
                     tvPlaylistDescription.isVisible = false
-                } else tvPlaylistDescription.text = playlist.playlistDescription
-
+                } else {
+                    tvPlaylistDescription.isVisible = true
+                    tvPlaylistDescription.text = playlist.playlistDescription
+                }
 
                 tvTracksAmount.text = requireContext().resources.getQuantityString(
                     R.plurals.track_count,

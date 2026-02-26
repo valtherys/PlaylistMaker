@@ -1,6 +1,5 @@
 package com.practicum.playlistmaker.domain.impl.sharing
 
-import android.R
 import com.practicum.playlistmaker.domain.api.db.PlaylistsRepository
 import com.practicum.playlistmaker.domain.api.sharing.AppConfigRepository
 import com.practicum.playlistmaker.domain.api.sharing.ExternalNavigator

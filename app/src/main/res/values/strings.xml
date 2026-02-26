@@ -63,6 +63,10 @@
     <string name="delete_playlist">Удалить плейлист</string>
     <string name="delete_named_playlist">Хотите удалить плейлист «%s»?</string>
     <string name="empty_playlist">Плейлист пуст</string>
+    <string name="options">опции</string>
+    <string name="divider">разделитель</string>
+    <string name="edit">Редактировать</string>
+    <string name="save">Сохранить</string>
 
     <plurals name="track_count">
         <item quantity="zero">%d треков</item>

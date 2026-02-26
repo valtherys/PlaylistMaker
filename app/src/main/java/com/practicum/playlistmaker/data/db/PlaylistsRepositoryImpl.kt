@@ -61,7 +61,7 @@ class PlaylistsRepositoryImpl(
     suspend fun deleteTrack(track: Track): Boolean {
         val trackEntity = playlistTrackDbMapper.map(track)
         val res = playlistTrackDao.deleteTrack(trackEntity)
-        return (res > ROWS_UNUPDATED)
+        return res > ROWS_UNUPDATED
     }
 
     override suspend fun deleteTrackFromPlaylist(track: Track, playlist: Playlist): Boolean {
@@ -75,7 +75,7 @@ class PlaylistsRepositoryImpl(
             deleteTrack(track)
         }
         val res = playlistDao.updatePlaylist(playlistEntity)
-        return (res > ROWS_UNUPDATED)
+        return res > ROWS_UNUPDATED
     }
 
     override suspend fun deletePlaylist(id: Int): Boolean {
@@ -90,7 +90,7 @@ class PlaylistsRepositoryImpl(
             }
         }
         val res = playlistDao.deletePlaylist(playlistEntity)
-        return (res > ROWS_UNUPDATED)
+        return res > ROWS_UNUPDATED
     }
 
     companion object {

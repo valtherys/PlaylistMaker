@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -29,19 +30,21 @@ import com.practicum.playlistmaker.utils.dpToPx
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 
-class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreationBinding>() {
+open class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreationBinding>() {
     override val applyImeInset = true
-    private var coverUriSelected: Uri? = null
-    private var coverSaved: File? = null
+    protected var coverUriSelected: Uri? = null
+    protected open var coverSaved: File? = null
 
-    private val playlistName: String
+    protected val playlistName: String
         get() = binding.etPlaylistName.text.toString()
-    private val playlistDescription: String
+    protected val playlistDescription: String
         get() = binding.etPlaylistDescription.text.toString()
 
     private lateinit var confirmDialog: MaterialAlertDialogBuilder
 
     private val viewModel: PlaylistCreationViewModel by viewModel()
+
+    protected lateinit var pickMedia: ActivityResultLauncher<PickVisualMediaRequest>
 
     override fun createBinding(
         inflater: LayoutInflater, container: ViewGroup?
@@ -58,16 +61,9 @@ class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreationBindi
             }.setPositiveButton(R.string.finish) { _, _ ->
                 findNavController().navigateUp()
             }
-    }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        binding.buttonCreate.isEnabled = false
-
-        val pickMedia =
+        pickMedia =
             registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-
                 if (uri != null) {
                     loadCover(uri)
                     coverUriSelected = uri
@@ -75,6 +71,13 @@ class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreationBindi
                     Log.d("PhotoPicker", "No media selected")
                 }
             }
+
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        initFragment()
 
         binding.btnBack.setOnClickListener {
             handleBackAction()
@@ -89,7 +92,7 @@ class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreationBindi
         }
 
         binding.buttonCreate.setOnClickListener {
-            onCreatePlaylist()
+            onUpdatePlaylist()
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(
@@ -101,51 +104,52 @@ class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreationBindi
             }
         )
 
-        viewModel.observePlaylistCreationFlag().observe(viewLifecycleOwner) {
-            if (it) {
-                showSnackbar()
-                findNavController().navigateUp()
-            }
+        viewModel.observePlaylistUpdated().observe(viewLifecycleOwner) {
+            onPlaylistUpdated(it)
         }
 
-        viewModel.observeSavedCover().observe(viewLifecycleOwner){
+        viewModel.observeSavedCover().observe(viewLifecycleOwner) {
             it?.let {
                 coverSaved = it
-                viewModel.createPlaylist(createPlaylistObj())
+                viewModel.updatePlaylist(createPlaylistObj())
             }
         }
     }
 
-    private fun onCreatePlaylist() {
+    protected open fun initFragment() {
+        binding.buttonCreate.isEnabled = false
+    }
+
+    protected open fun onUpdatePlaylist() {
         coverUriSelected?.let {
             viewModel.saveImageIntoStorage(it, playlistName)
             return
         }
 
-        viewModel.createPlaylist(
+        viewModel.updatePlaylist(
             createPlaylistObj()
         )
     }
 
-    private fun handleBackAction() {
+    protected open fun handleBackAction() {
         if (coverUriSelected != null && (playlistName.isNotBlank() || playlistDescription.isNotBlank())) {
             val dialog = confirmDialog.show()
             stileDialog(dialog)
         } else findNavController().navigateUp()
     }
 
-    private fun createPlaylistObj(): Playlist {
+    protected open fun createPlaylistObj(): Playlist {
         return Playlist(
             playlistName = playlistName,
             playlistDescription = playlistDescription,
-            coverFilePath = coverSaved?.toUri().toString(),
+            coverFilePath = coverSaved?.toUri()?.toString(),
             trackIds = listOf(),
             tracksAmount = 0
         )
     }
 
 
-    private fun loadCover(uri: Uri) {
+    protected fun loadCover(uri: Uri) {
         val playlistCornerRadiusPx = requireContext().dpToPx(PLAYLIST_CORNER_RADIUS)
         Glide.with(requireContext()).load(uri)
             .transform(CenterCrop(), RoundedCorners(playlistCornerRadiusPx))
@@ -157,18 +161,35 @@ class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreationBindi
         CustomSnackbar(requireActivity().findViewById<LinearLayout>(R.id.main)).show(text)
     }
 
-    private fun stileDialog(dialog: AlertDialog){
+    protected open fun onPlaylistUpdated(state: Boolean) {
+        if (state) {
+            showSnackbar()
+            findNavController().navigateUp()
+        }
+    }
+
+    private fun stileDialog(dialog: AlertDialog) {
         val buttonPadding = requireContext().dpToPx(BUTTON_PADDING_HORIZONTAL)
         (dialog as AlertDialog).getButton(AlertDialog.BUTTON_NEUTRAL)
             .setTextColor(getColor(requireContext(), R.color.YP_Blue))
-        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setPadding(buttonPadding,BUTTON_PADDING_VERTICAL, buttonPadding,BUTTON_PADDING_VERTICAL)
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setPadding(
+            buttonPadding,
+            BUTTON_PADDING_VERTICAL,
+            buttonPadding,
+            BUTTON_PADDING_VERTICAL
+        )
         dialog.getButton(AlertDialog.BUTTON_POSITIVE)
             .setTextColor(getColor(requireContext(), R.color.YP_Blue))
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setPadding(buttonPadding,BUTTON_PADDING_VERTICAL, buttonPadding,BUTTON_PADDING_VERTICAL)
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setPadding(
+            buttonPadding,
+            BUTTON_PADDING_VERTICAL,
+            buttonPadding,
+            BUTTON_PADDING_VERTICAL
+        )
     }
 
     companion object {
-        private const val PLAYLIST_CORNER_RADIUS = 8f
+        protected const val PLAYLIST_CORNER_RADIUS = 8f
         private const val BUTTON_PADDING_HORIZONTAL = 16f
         private const val BUTTON_PADDING_VERTICAL = 0
     }
