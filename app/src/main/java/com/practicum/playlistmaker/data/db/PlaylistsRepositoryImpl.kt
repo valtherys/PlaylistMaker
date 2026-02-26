@@ -10,6 +10,7 @@ import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.ui.models.TrackParcelable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class PlaylistsRepositoryImpl(
@@ -74,6 +75,21 @@ class PlaylistsRepositoryImpl(
             deleteTrack(track)
         }
         val res = playlistDao.updatePlaylist(playlistEntity)
+        return (res > ROWS_UNUPDATED)
+    }
+
+    override suspend fun deletePlaylist(id: Int): Boolean {
+        val playlist = playlistDao.getPlaylist(id).first()
+        val trackIds = playlist.trackIds ?: listOf()
+        val playlistEntity = playlistDbMapper.map(playlist)
+
+        for (trackId in trackIds) {
+            val playlistsWithTrack = playlistDao.countPlaylistsContainingTrack(trackId)
+            if (playlistsWithTrack == ONE_PLAYLIST_WITH_TRACK) {
+                playlistTrackDao.deleteTrackById(trackId)
+            }
+        }
+        val res = playlistDao.deletePlaylist(playlistEntity)
         return (res > ROWS_UNUPDATED)
     }
 

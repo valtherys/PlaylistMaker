@@ -13,6 +13,7 @@ import com.practicum.playlistmaker.data.search.TracksSearchRepositoryImpl
 import com.practicum.playlistmaker.data.settings.UserSettingsRepositoryImpl
 import com.practicum.playlistmaker.data.sharing.AppConfigRepositoryImpl
 import com.practicum.playlistmaker.data.sharing.ExternalNavigatorImpl
+import com.practicum.playlistmaker.data.sharing.PlaylistMessageBuilderRepositoryImpl
 import com.practicum.playlistmaker.data.storage.ImageStorageRepositoryImpl
 import com.practicum.playlistmaker.domain.api.db.FavoritesRepository
 import com.practicum.playlistmaker.domain.api.db.PlaylistsRepository
@@ -24,6 +25,7 @@ import com.practicum.playlistmaker.domain.api.search.TracksSearchRepository
 import com.practicum.playlistmaker.domain.api.settings.UserSettingsRepository
 import com.practicum.playlistmaker.domain.api.sharing.AppConfigRepository
 import com.practicum.playlistmaker.domain.api.sharing.ExternalNavigator
+import com.practicum.playlistmaker.domain.api.sharing.PlaylistMessageBuilderRepository
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
@@ -69,4 +71,6 @@ val repositoryModule = module {
         PlaylistsRepositoryImpl(get(), get(), get(), get())
     }
     factory<ImageStorageRepository> { ImageStorageRepositoryImpl(get()) }
+
+    factory<PlaylistMessageBuilderRepository> { PlaylistMessageBuilderRepositoryImpl(androidContext()) }
 }

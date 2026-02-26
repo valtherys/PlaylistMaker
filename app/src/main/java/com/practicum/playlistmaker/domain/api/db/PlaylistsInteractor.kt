@@ -11,6 +11,7 @@ interface PlaylistsInteractor {
     fun getPlaylistsFromDb(): Flow<List<Playlist>?>
     suspend fun deletePlaylists()
     fun getPlaylist(id: Int): Flow<Playlist>
-    fun getPlaylistTracks(ids: List<String>): Flow<List<Track>>
+    fun getPlaylistTracks(playlistId: List<String>): Flow<List<Track>>
     suspend fun deleteTrackFromPlaylist(track: Track, playlist: Playlist): Boolean
+    suspend fun deletePlaylist(playlistId: Int): Boolean
 }

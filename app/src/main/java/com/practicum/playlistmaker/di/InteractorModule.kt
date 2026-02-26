@@ -38,7 +38,7 @@ val interactorModule = module {
     }
 
     factory<SharingInteractor> {
-        SharingInteractorImpl(get(), get())
+        SharingInteractorImpl(get(), get(), get(), get())
     }
 
     factory<UserSettingsInteractor> {

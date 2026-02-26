@@ -13,4 +13,5 @@ interface PlaylistsRepository {
     fun getPlaylist(id: Int): Flow<Playlist>
     fun getPlaylistTracks(ids: List<String>): Flow<List<Track>>
     suspend fun deleteTrackFromPlaylist(track: Track, playlist: Playlist): Boolean
+    suspend fun deletePlaylist(id: Int): Boolean
 }

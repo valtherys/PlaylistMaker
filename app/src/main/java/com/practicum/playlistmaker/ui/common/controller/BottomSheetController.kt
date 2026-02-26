@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.ui.audioplayer.controller
+package com.practicum.playlistmaker.ui.common.controller
 
 import android.view.View
 import android.widget.LinearLayout
@@ -10,7 +10,6 @@ class BottomSheetController(
     private val dimView: View
 ) {
     fun init() {
-
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {

@@ -4,7 +4,7 @@
     <string name="media_library">Медиатека</string>
     <string name="settings">Настройки</string>
     <string name="dark_theme">Темная тема</string>
-    <string name="share">Поделиться приложением</string>
+    <string name="share_app">Поделиться приложением</string>
     <string name="support">Написать в поддержку</string>
     <string name="agreement">Пользовательское соглашение</string>
     <string name="arrow_forward">Стрелка вперед</string>
@@ -56,6 +56,13 @@
     <string name="wish_to_delete_track">Хотите удалить трек?</string>
     <string name="no">Нет</string>
     <string name="yes">Да</string>
+    <string name="no_tracks_to_share">В этом плейлисте нет списка треков, которым можно поделиться</string>
+    <string name="ok">Ладно</string>
+    <string name="share">Поделиться</string>
+    <string name="edit_info">Редактировать информацию</string>
+    <string name="delete_playlist">Удалить плейлист</string>
+    <string name="delete_named_playlist">Хотите удалить плейлист «%s»?</string>
+    <string name="empty_playlist">Плейлист пуст</string>
 
     <plurals name="track_count">
         <item quantity="zero">%d треков</item>

@@ -140,7 +140,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
-        android:id="@+id/bottom_sheet"
+        android:id="@+id/bottom_sheet_tracks"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/rectangle_rounded_top"
@@ -149,15 +149,108 @@
         android:paddingTop="24dp"
         app:behavior_hideable="false"
         app:behavior_peekHeight="220dp"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-    >
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_tracks"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:listitem="@layout/item_track"
-            android:nestedScrollingEnabled="false"/>
+            android:nestedScrollingEnabled="false"
+            tools:listitem="@layout/item_track" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/dim_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.5"
+        android:background="@color/YP_Black"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/bottom_sheet_options"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/rectangle_rounded_top"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="24dp"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="500dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/playlist_mini"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="8dp"
+            android:layout_marginBottom="8dp">
+
+            <ImageView
+                android:id="@+id/iv_playlist_cover_mini"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@drawable/ic_placeholder_45" />
+
+            <TextView
+                android:id="@+id/tv_playlist_name_mini"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="1dp"
+                android:ellipsize="end"
+                android:lines="1"
+                android:textAppearance="@style/YSRegular16"
+                android:textColor="?attr/colorOnPrimary"
+                app:layout_constraintBottom_toTopOf="@id/tv_playlist_description_mini"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/iv_playlist_cover_mini"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Best songs 2021" />
+
+            <TextView
+                android:id="@+id/tv_playlist_description_mini"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginBottom="6dp"
+                android:ellipsize="end"
+                android:lines="1"
+                android:textAppearance="@style/YSRegular11"
+                android:textColor="@color/YP_Text_Gray"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/iv_playlist_cover_mini"
+                app:layout_constraintTop_toBottomOf="@id/tv_playlist_name_mini"
+                tools:text="98 треков" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/tv_option_share"
+            style="@style/TextViewPlaylistOption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/share" />
+
+        <TextView
+            android:id="@+id/tv_edit_info"
+            style="@style/TextViewPlaylistOption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/edit_info" />
+
+        <TextView
+            android:id="@+id/tv_option_delete"
+            style="@style/TextViewPlaylistOption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/delete_playlist" />
+
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

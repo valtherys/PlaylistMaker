@@ -296,7 +296,7 @@
         android:visibility="gone" />
 
     <LinearLayout
-        android:id="@+id/bottom_sheet"
+        android:id="@+id/bottom_sheet_tracks"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/rectangle_rounded_top"

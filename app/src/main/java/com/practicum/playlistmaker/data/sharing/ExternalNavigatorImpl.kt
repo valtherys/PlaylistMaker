@@ -32,6 +32,17 @@ class ExternalNavigatorImpl(private val context: Context) : ExternalNavigator {
         )
     }
 
+    override fun sharePlaylist(message: String) {
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, message)
+            type = "text/plain"
+        }
+        context.startActivity(
+            Intent.createChooser(shareIntent, message).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        )
+    }
+
     override fun openLink(link: String) {
         val urlIntent =
             Intent(Intent.ACTION_VIEW, link.toUri()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

@@ -26,8 +26,8 @@ class PlaylistsInteractorImpl(private val repository: PlaylistsRepository) : Pla
         return repository.getPlaylist(id)
     }
 
-    override fun getPlaylistTracks(ids: List<String>): Flow<List<Track>> {
-        return repository.getPlaylistTracks(ids)
+    override fun getPlaylistTracks(playlistId: List<String>): Flow<List<Track>> {
+        return repository.getPlaylistTracks(playlistId)
     }
 
     override suspend fun deleteTrackFromPlaylist(
@@ -35,5 +35,9 @@ class PlaylistsInteractorImpl(private val repository: PlaylistsRepository) : Pla
         playlist: Playlist
     ): Boolean {
         return repository.deleteTrackFromPlaylist(track, playlist)
+    }
+
+    override suspend fun deletePlaylist(playlistId: Int): Boolean {
+        return repository.deletePlaylist(playlistId)
     }
 }

@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker.data.db.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
@@ -27,4 +28,7 @@ interface PlaylistDao {
 
     @Query("SELECT COUNT(*) FROM playlist_table WHERE trackIds LIKE :trackIdPassed")
     suspend fun countPlaylistsContainingTrack(trackIdPassed: String): Int
+
+    @Delete
+    suspend fun deletePlaylist(playlistEntity: PlaylistEntity): Int
 }
