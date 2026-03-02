@@ -11,7 +11,6 @@ import com.practicum.playlistmaker.ui.playlist_editing.view_model.PlaylistEditin
 import com.practicum.playlistmaker.utils.loadImage
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
-import java.io.File
 
 class PlaylistEditingFragment : PlaylistCreationFragment() {
     private val playlistId: Int by lazy {
