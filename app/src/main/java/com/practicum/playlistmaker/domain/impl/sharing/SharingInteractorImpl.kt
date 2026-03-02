@@ -30,7 +30,7 @@ class SharingInteractorImpl(
 
     override suspend fun sharePlaylist(playlistId: Int, trackIds: List<String>) {
         val playlist = playlistsRepository.getPlaylist(playlistId).first()
-        val tracks = playlistsRepository.getPlaylistTracks(trackIds).first()
+        val tracks = playlistsRepository.getPlaylistTracks(playlistId).first()
         val message = getPlaylistShareMessage(playlist, tracks)
 
         externalNavigator.sharePlaylist(message)

@@ -5,15 +5,14 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorPrimary"
+    android:background="@color/YP_Light_Gray"
     android:orientation="vertical"
     tools:context=".ui.playlist.fragment.PlaylistFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/ll_playlist"
+        android:id="@+id/cl_playlist"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/YP_Light_Gray"
+        android:layout_height="wrap_content"
         android:paddingBottom="16dp">
 
         <androidx.constraintlayout.widget.Guideline
@@ -30,11 +29,14 @@
             android:orientation="vertical"
             app:layout_constraintGuide_end="16dp" />
 
+
         <ImageView
             android:id="@+id/iv_playlist_cover"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:background="?attr/colorPrimary"
             android:contentDescription="@string/playlist_cover"
+            android:padding="36dp"
             android:scaleType="centerCrop"
             app:layout_constraintBottom_toTopOf="@id/tv_playlist_name"
             app:layout_constraintDimensionRatio="h,1:1"
@@ -47,8 +49,6 @@
             android:id="@+id/btn_back"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="4dp"
             android:background="@android:color/transparent"
             android:contentDescription="@string/back"
             app:layout_constraintStart_toStartOf="parent"
@@ -148,20 +148,34 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/rectangle_rounded_top"
+        android:gravity="center_horizontal"
         android:orientation="vertical"
         android:paddingHorizontal="12dp"
         android:paddingTop="24dp"
         app:behavior_hideable="false"
-        app:behavior_peekHeight="220dp"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        app:behavior_peekHeight="0dp" >
+
+        <TextView
+            android:id="@+id/tv_placeholder_text"
+            style="@style/PlaceholderTextView"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:drawablePadding="16dp"
+            android:text="@string/no_added_tracks_yet"
+            android:textAppearance="@style/YSMedium14"
+            android:visibility="gone"
+            app:drawableTopCompat="@drawable/ic_nothing_found_85" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_tracks"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipToPadding="false"
             android:nestedScrollingEnabled="false"
-            tools:listitem="@layout/item_track"
-            android:clipToPadding="false"/>
+            tools:listitem="@layout/item_track" />
     </LinearLayout>
 
     <View
@@ -181,15 +195,15 @@
         android:paddingHorizontal="16dp"
         android:paddingTop="24dp"
         app:behavior_hideable="true"
-        app:behavior_peekHeight="500dp"
+        app:behavior_peekHeight="380dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/playlist_mini"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingVertical="8dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="8dp"
+            android:paddingVertical="8dp">
 
             <ImageView
                 android:id="@+id/iv_playlist_cover_mini"

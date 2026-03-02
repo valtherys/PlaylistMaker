@@ -67,6 +67,11 @@
     <string name="divider">разделитель</string>
     <string name="edit">Редактировать</string>
     <string name="save">Сохранить</string>
+    <string name="no_added_tracks_yet">Вы еще не добавили ни одного трека</string>
+    <string name="share_playlist">Поделиться плейлистом</string>
+    <string name="sure_delete_playlist">Вы уверены, что хотите удалить этот плейлист?</string>
+    <string name="quit">Отмена</string>
+    <string name="delete">Удалить</string>
 
     <plurals name="track_count">
         <item quantity="zero">%d треков</item>

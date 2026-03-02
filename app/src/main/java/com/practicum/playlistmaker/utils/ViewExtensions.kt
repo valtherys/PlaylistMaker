@@ -2,11 +2,16 @@ package com.practicum.playlistmaker.utils
 
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.textfield.TextInputEditText
+import com.practicum.playlistmaker.R
 
 
 fun TabLayout.setIndicatorMargins(indicatorMarginPx: Int) {
@@ -45,4 +50,18 @@ fun View.setImeInsetsWithFocus() {
             }
         }
     }
+}
+
+
+fun ImageView.loadImage(path: String?, cornerRadPx: Int? = null) {
+    val insert =
+        Glide.with(this).load(path).placeholder((R.drawable.ic_placeholder_45)).transform(
+            CenterCrop()
+        )
+
+    cornerRadPx?.let {
+        insert.transform(CenterCrop(), RoundedCorners(cornerRadPx))
+    }
+
+    insert.into(this)
 }

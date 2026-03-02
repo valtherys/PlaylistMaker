@@ -35,20 +35,25 @@ class PlaylistViewModel(
             interactor.getPlaylist(playlistId).collect { playlist ->
                 _playlistState.value = _playlistState.value?.copy(playlist = playlist)
                 playlist.trackIds?.let {
-                    initTracks(it)
+                    initTracks()
                 }
             }
         }
     }
 
-    private fun initTracks(ids: List<String>) {
+    private fun initTracks() {
         tracksJob?.cancel()
         tracksJob = viewModelScope.launch {
-            interactor.getPlaylistTracks(ids).collect { tracks ->
+            interactor.getPlaylistTracks(playlistId).collect { tracks ->
                 if (tracks.isNotEmpty()) {
                     val duration = calculatePlaylistDurationMinutes(tracks)
+                    val tracksIdOrderMap = _playlistState.value?.playlist?.trackIds?.withIndex()
+                        ?.associate { it.value to it.index }
+                    val sortedTracks =
+                        tracks.sortedBy { tracksIdOrderMap?.get(it.trackId) ?: Int.MAX_VALUE }
+                            .reversed()
                     _playlistState.value = _playlistState.value?.copy(
-                        tracksState = PlaylistTracksState.Content(tracks),
+                        tracksState = PlaylistTracksState.Content(sortedTracks),
                         duration = duration
                     )
                 } else {
@@ -61,10 +66,9 @@ class PlaylistViewModel(
         }
     }
 
-    fun deleteTrack(track: Track) {
-        val playlist = _playlistState.value?.playlist!!
+    fun deleteTrack(trackId: String) {
         viewModelScope.launch {
-            interactor.deleteTrackFromPlaylist(track, playlist)
+            interactor.deleteTrackFromPlaylist(trackId, playlistId)
         }
     }
 
@@ -77,7 +81,7 @@ class PlaylistViewModel(
         }
     }
 
-    fun deletePlaylist(){
+    fun deletePlaylist() {
         viewModelScope.launch {
             _deletePlaylistSuccessful.value = interactor.deletePlaylist(playlistId)
         }

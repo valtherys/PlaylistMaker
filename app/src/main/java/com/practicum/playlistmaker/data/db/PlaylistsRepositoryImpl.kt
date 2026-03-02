@@ -51,46 +51,44 @@ class PlaylistsRepositoryImpl(
         return playlistDao.getPlaylist(id).distinctUntilChanged()
     }
 
-    override fun getPlaylistTracks(ids: List<String>): Flow<List<Track>> {
-        val tracksEntity = playlistTrackDao.getPlaylistTracks(ids).distinctUntilChanged()
+    override suspend fun getPlaylistTracks(playlistId: Int): Flow<List<Track>> {
+        val playlistEntity = playlistDao.getPlaylist(playlistId).first()
+        val tracksEntity = playlistTrackDao.getPlaylistTracks(playlistEntity.trackIds ?: listOf())
+            .distinctUntilChanged()
         val tracks =
             tracksEntity.map { tracks -> tracks.map { track -> playlistTrackDbMapper.map(track) } }
         return tracks
     }
 
-    suspend fun deleteTrack(track: Track): Boolean {
-        val trackEntity = playlistTrackDbMapper.map(track)
-        val res = playlistTrackDao.deleteTrack(trackEntity)
-        return res > ROWS_UNUPDATED
-    }
-
-    override suspend fun deleteTrackFromPlaylist(track: Track, playlist: Playlist): Boolean {
+    override suspend fun deleteTrackFromPlaylist(trackId: String, playlistId: Int): Boolean {
+        val playlist = playlistDao.getPlaylist(playlistId).first()
         val updatedPlaylist = playlist.copy(
-            trackIds = playlist.trackIds?.filter { it != track.trackId },
+            trackIds = playlist.trackIds?.filter { it != trackId },
             tracksAmount = (playlist.trackIds?.size ?: 0) - 1
         )
-        val playlistEntity = playlistDbMapper.map(updatedPlaylist)
-        val playlistsWithTrack = playlistDao.countPlaylistsContainingTrack(track.trackId)
-        if (playlistsWithTrack == ONE_PLAYLIST_WITH_TRACK) {
-            deleteTrack(track)
-        }
-        val res = playlistDao.updatePlaylist(playlistEntity)
+        val updatedPlaylistEntity = playlistDbMapper.map(updatedPlaylist)
+
+        deleteUniqueTracks(trackId)
+        val res = playlistDao.updatePlaylist(updatedPlaylistEntity)
         return res > ROWS_UNUPDATED
     }
 
     override suspend fun deletePlaylist(id: Int): Boolean {
         val playlist = playlistDao.getPlaylist(id).first()
         val trackIds = playlist.trackIds ?: listOf()
-        val playlistEntity = playlistDbMapper.map(playlist)
 
         for (trackId in trackIds) {
-            val playlistsWithTrack = playlistDao.countPlaylistsContainingTrack(trackId)
-            if (playlistsWithTrack == ONE_PLAYLIST_WITH_TRACK) {
-                playlistTrackDao.deleteTrackById(trackId)
-            }
+            deleteUniqueTracks(trackId)
         }
-        val res = playlistDao.deletePlaylist(playlistEntity)
+        val res = playlistDao.deletePlaylistById(playlist.playlistId!!)
         return res > ROWS_UNUPDATED
+    }
+
+    private suspend fun deleteUniqueTracks(trackId: String) {
+        val playlistsWithTrack = playlistDao.countPlaylistsContainingTrack(trackId)
+        if (playlistsWithTrack == ONE_PLAYLIST_WITH_TRACK) {
+            playlistTrackDao.deleteTrackById(trackId)
+        }
     }
 
     companion object {

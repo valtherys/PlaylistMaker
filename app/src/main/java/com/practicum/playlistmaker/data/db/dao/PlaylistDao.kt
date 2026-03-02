@@ -30,6 +30,6 @@ interface PlaylistDao {
     @Query("SELECT COUNT(*) FROM playlist_table WHERE trackIds LIKE :trackIdPassed")
     suspend fun countPlaylistsContainingTrack(trackIdPassed: String): Int
 
-    @Delete
-    suspend fun deletePlaylist(playlistEntity: PlaylistEntity): Int
+    @Query("DELETE FROM playlist_table WHERE playlistId = :playlistIdPassed")
+    suspend fun deletePlaylistById(playlistIdPassed: Int): Int
 }
