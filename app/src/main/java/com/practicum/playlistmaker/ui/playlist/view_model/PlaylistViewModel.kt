@@ -4,9 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.domain.api.db.PlaylistsInteractor
 import com.practicum.playlistmaker.domain.api.sharing.SharingInteractor
+import com.practicum.playlistmaker.domain.models.Playlist
 import com.practicum.playlistmaker.domain.models.Track
+import com.practicum.playlistmaker.ui.common.UIText
 import com.practicum.playlistmaker.utils.toMillis
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -59,7 +62,7 @@ class PlaylistViewModel(
                 } else {
                     _playlistState.value = _playlistState.value?.copy(
                         tracksState = PlaylistTracksState.Empty,
-                        duration = 0
+                        duration = UIText.Plural(R.plurals.minutes_count, 0)
                     )
                 }
             }
@@ -72,18 +75,28 @@ class PlaylistViewModel(
         }
     }
 
-    fun sharePlaylist() {
-        viewModelScope.launch {
-            sharingInteractor.sharePlaylist(
-                playlistId,
-                _playlistState.value?.playlist?.trackIds ?: listOf()
-            )
+    fun sharePlaylist(tracksAmountString: String) {
+        when (val state = _playlistState.value?.tracksState) {
+            is PlaylistTracksState.Content -> viewModelScope.launch {
+                _playlistState.value?.playlist?.let {
+                    sharingInteractor.sharePlaylist(
+                        tracksAmountString,
+                        it,
+                        state.tracks
+                    )
+                }
+            }
+
+            else -> {}
         }
     }
 
     fun deletePlaylist() {
         viewModelScope.launch {
-            _deletePlaylistSuccessful.value = interactor.deletePlaylist(playlistId)
+            val res = interactor.deletePlaylist(playlistId)
+            if (res) {
+                _deletePlaylistSuccessful.value = true
+            }
         }
     }
 
@@ -95,11 +108,11 @@ class PlaylistViewModel(
         _bottomSheetIsVisible.value = true
     }
 
-    private fun calculatePlaylistDurationMinutes(tracks: List<Track>): Int {
+    private fun calculatePlaylistDurationMinutes(tracks: List<Track>): UIText.Plural {
         val tracksDurationMillis = tracks.mapNotNull { track -> track.trackTime?.toMillis() }
         val durationMillis = tracksDurationMillis.sum()
         val durationMinutes = round(durationMillis / MILLIS_IN_MINUTE).toInt()
-        return durationMinutes
+        return UIText.Plural(R.plurals.minutes_count, durationMinutes)
     }
 
     companion object {

@@ -16,6 +16,7 @@ import com.practicum.playlistmaker.databinding.FragmentPlaylistBinding
 import com.practicum.playlistmaker.domain.models.Playlist
 import com.practicum.playlistmaker.ui.audioplayer.fragment.AudioPlayerFragment
 import com.practicum.playlistmaker.ui.common.BindingFragment
+import com.practicum.playlistmaker.ui.common.UIText
 import com.practicum.playlistmaker.ui.common.controller.BottomSheetController
 import com.practicum.playlistmaker.ui.mappers.toParcelable
 import com.practicum.playlistmaker.ui.playlist.adapter.TracksBottomSheetAdapter
@@ -194,10 +195,10 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
         }
     }
 
-    private fun bindDuration(duration: Int) {
+    private fun bindDuration(duration: UIText.Plural) {
         binding.tvDuration.text =
-            resources.getQuantityString(R.plurals.minutes_count, duration)
-                .format(duration)
+            resources.getQuantityString(duration.resId, duration.amount)
+                .format(duration.amount)
     }
 
     private fun bindPlaylistToBottomSheet(playlist: Playlist?) {
@@ -246,9 +247,20 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
 
     private fun onShareClicked() {
         viewModel.hideBottomSheet()
-        when (lastTracksState) {
-            is PlaylistTracksState.Content -> viewModel.sharePlaylist()
-            PlaylistTracksState.Empty -> showNoTracksDialog()
+        when (val state = lastTracksState) {
+            is PlaylistTracksState.Content -> {
+                viewModel.sharePlaylist(
+                    resources.getQuantityString(
+                        R.plurals.track_count,
+                        state.tracks.size,
+                        state.tracks.size
+                    )
+                )
+            }
+
+            else -> {
+                showNoTracksDialog()
+            }
         }
     }
 

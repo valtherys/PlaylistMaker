@@ -7,5 +7,5 @@ interface ImageStorageInteractor {
     suspend fun saveImageToPrivateStorage(
         uri: Uri,
         playlistName: String,
-    ): File?
+    ): Uri?
 }

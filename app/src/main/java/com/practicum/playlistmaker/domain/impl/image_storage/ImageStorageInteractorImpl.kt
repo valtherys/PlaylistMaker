@@ -10,7 +10,7 @@ class ImageStorageInteractorImpl(private val repository: ImageStorageRepository)
     override suspend fun saveImageToPrivateStorage(
         uri: Uri,
         playlistName: String
-    ): File? {
+    ): Uri? {
         return repository.saveImageToPrivateStorage(uri, playlistName)
     }
 }

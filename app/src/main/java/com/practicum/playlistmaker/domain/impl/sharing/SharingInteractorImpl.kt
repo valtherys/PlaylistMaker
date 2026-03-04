@@ -1,20 +1,15 @@
 package com.practicum.playlistmaker.domain.impl.sharing
 
-import com.practicum.playlistmaker.domain.api.db.PlaylistsRepository
 import com.practicum.playlistmaker.domain.api.sharing.AppConfigRepository
 import com.practicum.playlistmaker.domain.api.sharing.ExternalNavigator
-import com.practicum.playlistmaker.domain.api.sharing.PlaylistMessageBuilderRepository
 import com.practicum.playlistmaker.domain.api.sharing.SharingInteractor
 import com.practicum.playlistmaker.domain.models.EmailData
 import com.practicum.playlistmaker.domain.models.Playlist
 import com.practicum.playlistmaker.domain.models.Track
-import kotlinx.coroutines.flow.first
 
 class SharingInteractorImpl(
     private val externalNavigator: ExternalNavigator,
     private val appConfigRepository: AppConfigRepository,
-    private val playlistsRepository: PlaylistsRepository,
-    private val playlistMessageBuilderRepository: PlaylistMessageBuilderRepository,
 ) : SharingInteractor {
     override fun shareApp() {
         externalNavigator.shareLink(getShareAppLink())
@@ -28,10 +23,12 @@ class SharingInteractorImpl(
         externalNavigator.openEmail(getSupportEmailData(), getMessage())
     }
 
-    override suspend fun sharePlaylist(playlistId: Int, trackIds: List<String>) {
-        val playlist = playlistsRepository.getPlaylist(playlistId).first()
-        val tracks = playlistsRepository.getPlaylistTracks(playlistId).first()
-        val message = getPlaylistShareMessage(playlist, tracks)
+    override fun sharePlaylist(
+        tracksAmountString: String,
+        playlist: Playlist,
+        tracks: List<Track>
+    ) {
+        val message = getPlaylistShareMessage(tracksAmountString, playlist, tracks)
 
         externalNavigator.sharePlaylist(message)
     }
@@ -52,7 +49,21 @@ class SharingInteractorImpl(
         return appConfigRepository.getMessageToUser()
     }
 
-    private fun getPlaylistShareMessage(playlist: Playlist, tracks: List<Track>): String{
-        return playlistMessageBuilderRepository.buildMessage(playlist, tracks)
+    private fun getPlaylistShareMessage(
+        tracksAmountString: String,
+        playlist: Playlist,
+        tracks: List<Track>
+    ): String {
+        return buildString {
+            appendLine(playlist.playlistName)
+            if (!playlist.playlistDescription.isNullOrEmpty()) {
+                appendLine(playlist.playlistDescription)
+            }
+            appendLine(tracksAmountString)
+            appendLine()
+            tracks.forEachIndexed { index, track ->
+                appendLine("${index + 1}. ${track.artistName} - ${track.trackName} (${track.trackTime})")
+            }
+        }
     }
 }

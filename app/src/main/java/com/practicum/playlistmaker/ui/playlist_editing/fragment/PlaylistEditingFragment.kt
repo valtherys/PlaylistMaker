@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.ui.playlist_editing.fragment
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
@@ -48,11 +49,11 @@ class PlaylistEditingFragment : PlaylistCreationFragment() {
         }
     }
 
-    override fun createPlaylistObj(): Playlist {
+    override fun createPlaylistObj(uri: Uri?): Playlist {
         return playlist.copy(
             playlistName = playlistName,
             playlistDescription = playlistDescription,
-            coverFilePath = coverSaved?.toUri()?.toString() ?: playlist.coverFilePath,
+            coverFilePath = uri?.toString() ?: playlist.coverFilePath,
         )
     }
 

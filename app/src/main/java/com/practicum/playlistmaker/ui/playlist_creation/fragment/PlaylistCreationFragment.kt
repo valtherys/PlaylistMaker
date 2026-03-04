@@ -11,7 +11,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.net.toUri
 import androidx.core.widget.doAfterTextChanged
 import androidx.navigation.fragment.findNavController
 import com.practicum.playlistmaker.R
@@ -19,12 +18,12 @@ import com.practicum.playlistmaker.databinding.FragmentPlaylistCreationBinding
 import com.practicum.playlistmaker.domain.models.Playlist
 import com.practicum.playlistmaker.ui.common.BindingFragment
 import com.practicum.playlistmaker.ui.common.snackbar.CustomSnackbar
+import com.practicum.playlistmaker.ui.playlist_creation.view_model.CoverUri
 import com.practicum.playlistmaker.ui.playlist_creation.view_model.PlaylistCreationViewModel
 import com.practicum.playlistmaker.utils.dpToPx
 import com.practicum.playlistmaker.utils.loadImage
 import com.practicum.playlistmaker.utils.showDialog
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.io.File
 
 open class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreationBinding>() {
     override val applyImeInset = true
@@ -40,9 +39,6 @@ open class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreation
     private val navController by lazy { findNavController() }
     val playlistCornerRadiusPx by lazy { requireContext().dpToPx(PLAYLIST_CORNER_RADIUS) }
 
-    var coverUriSelected: Uri? = null
-    var coverSaved: File? = null
-
     override fun createBinding(
         inflater: LayoutInflater, container: ViewGroup?
     ): FragmentPlaylistCreationBinding {
@@ -57,12 +53,12 @@ open class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreation
         observeViewModel()
     }
 
-    protected fun initPickMedia(){
+    protected fun initPickMedia() {
         pickMedia =
             registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
                 if (uri != null) {
                     binding.playlistCover.loadImage(uri.toString(), playlistCornerRadiusPx)
-                    coverUriSelected = uri
+                    viewModel.onCoverSelected(uri)
                 } else {
                     Log.d("PhotoPicker", "No media selected")
                 }
@@ -73,7 +69,7 @@ open class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreation
         binding.buttonCreate.isEnabled = false
     }
 
-    protected fun initListeners(){
+    protected fun initListeners() {
         binding.btnBack.setOnClickListener {
             handleBackAction()
         }
@@ -100,32 +96,24 @@ open class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreation
         )
     }
 
-    protected open fun observeViewModel(){
+    protected open fun observeViewModel() {
         viewModel.observePlaylistUpdated().observe(viewLifecycleOwner) {
             onPlaylistUpdated(it)
         }
 
-        viewModel.observeSavedCover().observe(viewLifecycleOwner) {
-            it?.let {
-                coverSaved = it
-                viewModel.updatePlaylist(createPlaylistObj())
+        viewModel.observeCoverUri().observe(viewLifecycleOwner) {
+            if (it is CoverUri.CoverSaved) {
+                viewModel.updatePlaylist(createPlaylistObj(it.uri))
             }
         }
     }
 
     protected open fun onUpdatePlaylist() {
-        coverUriSelected?.let {
-            viewModel.saveImageIntoStorage(it, playlistName)
-            return
-        }
-
-        viewModel.updatePlaylist(
-            createPlaylistObj()
-        )
+        viewModel.onSaveImageIntoStorage(playlistName)
     }
 
     protected open fun handleBackAction() {
-        if (coverUriSelected != null && (playlistName.isNotBlank() || playlistDescription.isNotBlank())) {
+        if (viewModel.cover.value != CoverUri.Uninitialized && (playlistName.isNotBlank() || playlistDescription.isNotBlank())) {
             requireContext().showDialog(
                 titleRes = R.string.finish_playlist_creation,
                 messageRes = R.string.unsaved_data_will_be_lost,
@@ -136,11 +124,11 @@ open class PlaylistCreationFragment() : BindingFragment<FragmentPlaylistCreation
         } else navController.navigateUp()
     }
 
-    protected open fun createPlaylistObj(): Playlist {
+    protected open fun createPlaylistObj(uri: Uri?): Playlist {
         return Playlist(
             playlistName = playlistName,
             playlistDescription = playlistDescription,
-            coverFilePath = coverSaved?.toUri()?.toString() ,
+            coverFilePath = uri?.toString(),
             trackIds = listOf(),
             tracksAmount = 0
         )
