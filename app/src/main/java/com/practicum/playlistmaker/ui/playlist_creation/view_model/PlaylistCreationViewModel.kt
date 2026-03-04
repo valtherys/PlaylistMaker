@@ -9,31 +9,42 @@ import com.practicum.playlistmaker.domain.api.db.PlaylistsInteractor
 import com.practicum.playlistmaker.domain.api.image_storage.ImageStorageInteractor
 import com.practicum.playlistmaker.domain.models.Playlist
 import kotlinx.coroutines.launch
-import java.io.File
 
-class PlaylistCreationViewModel(
+open class PlaylistCreationViewModel(
     private val playlistsInteractor: PlaylistsInteractor,
     private val imageStorageInteractor: ImageStorageInteractor
 ) : ViewModel() {
-    private val _playlistCreatedFlag: MutableLiveData<Boolean> = MutableLiveData(false)
-    fun observePlaylistCreationFlag(): LiveData<Boolean> = _playlistCreatedFlag
+    protected val playlistUpdateSuccessful = MutableLiveData(false)
+    fun observePlaylistUpdated(): LiveData<Boolean> = playlistUpdateSuccessful
 
-    private val _savedCover: MutableLiveData<File?> = MutableLiveData(null)
-    fun observeSavedCover() = _savedCover
+    protected val coverUri = MutableLiveData<CoverUri>(CoverUri.Uninitialized)
 
-    fun createPlaylist(playlist: Playlist) {
-        viewModelScope.launch {
-            val addingIsSuccessful = playlistsInteractor.addPlaylistToDb(playlist)
-            if (addingIsSuccessful) {
-                _playlistCreatedFlag.postValue(true)
+    fun observeCoverUri(): LiveData<CoverUri> = coverUri
+    val cover = coverUri
+
+    fun onCoverSelected(uri: Uri) {
+        coverUri.value = CoverUri.CoverSelected(uri)
+    }
+
+    fun onSaveImageIntoStorage(playlistName: String) {
+        when (val current = coverUri.value) {
+            is CoverUri.CoverSelected -> {
+                viewModelScope.launch {
+                    val coverFile =
+                        imageStorageInteractor.saveImageToPrivateStorage(current.uri, playlistName)
+                    coverFile?.let {
+                        coverUri.value = CoverUri.CoverSaved(it)
+                    }
+                }
             }
+
+            else -> coverUri.value = CoverUri.CoverSaved(null)
         }
     }
 
-    fun saveImageIntoStorage(uri: Uri, playlistName: String) {
+    fun updatePlaylist(playlist: Playlist) {
         viewModelScope.launch {
-            val coverFile = imageStorageInteractor.saveImageToPrivateStorage(uri, playlistName)
-            _savedCover.value = coverFile
+            playlistUpdateSuccessful.value = playlistsInteractor.addPlaylistToDb(playlist)
         }
     }
 }

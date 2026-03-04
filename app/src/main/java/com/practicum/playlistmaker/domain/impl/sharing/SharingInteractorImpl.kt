@@ -4,10 +4,12 @@ import com.practicum.playlistmaker.domain.api.sharing.AppConfigRepository
 import com.practicum.playlistmaker.domain.api.sharing.ExternalNavigator
 import com.practicum.playlistmaker.domain.api.sharing.SharingInteractor
 import com.practicum.playlistmaker.domain.models.EmailData
+import com.practicum.playlistmaker.domain.models.Playlist
+import com.practicum.playlistmaker.domain.models.Track
 
 class SharingInteractorImpl(
     private val externalNavigator: ExternalNavigator,
-    private val appConfigRepository: AppConfigRepository
+    private val appConfigRepository: AppConfigRepository,
 ) : SharingInteractor {
     override fun shareApp() {
         externalNavigator.shareLink(getShareAppLink())
@@ -19,6 +21,16 @@ class SharingInteractorImpl(
 
     override fun openSupport() {
         externalNavigator.openEmail(getSupportEmailData(), getMessage())
+    }
+
+    override fun sharePlaylist(
+        tracksAmountString: String,
+        playlist: Playlist,
+        tracks: List<Track>
+    ) {
+        val message = getPlaylistShareMessage(tracksAmountString, playlist, tracks)
+
+        externalNavigator.sharePlaylist(message)
     }
 
     private fun getShareAppLink(): String {
@@ -35,5 +47,23 @@ class SharingInteractorImpl(
 
     private fun getMessage(): String {
         return appConfigRepository.getMessageToUser()
+    }
+
+    private fun getPlaylistShareMessage(
+        tracksAmountString: String,
+        playlist: Playlist,
+        tracks: List<Track>
+    ): String {
+        return buildString {
+            appendLine(playlist.playlistName)
+            if (!playlist.playlistDescription.isNullOrEmpty()) {
+                appendLine(playlist.playlistDescription)
+            }
+            appendLine(tracksAmountString)
+            appendLine()
+            tracks.forEachIndexed { index, track ->
+                appendLine("${index + 1}. ${track.artistName} - ${track.trackName} (${track.trackTime})")
+            }
+        }
     }
 }

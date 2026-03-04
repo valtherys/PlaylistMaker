@@ -1,6 +1,5 @@
 package com.practicum.playlistmaker.domain.models
 
-
 data class Playlist(
     var playlistId: Int? = null,
     val playlistName: String,

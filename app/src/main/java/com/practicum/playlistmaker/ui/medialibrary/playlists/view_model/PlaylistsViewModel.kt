@@ -7,11 +7,12 @@ import com.practicum.playlistmaker.domain.api.db.PlaylistsInteractor
 import kotlinx.coroutines.flow.map
 
 class PlaylistsViewModel(private val interactor: PlaylistsInteractor) : ViewModel() {
-    val playlistsLiveData:LiveData<PlaylistsState> = interactor.getPlaylistsFromDb().map { playlists ->
-        if (playlists.isNullOrEmpty()) {
-          PlaylistsState.Empty
-        } else {
-           PlaylistsState.Content(playlists)
-        }
-    }.asLiveData()
+    val playlistsLiveData: LiveData<PlaylistsState> =
+        interactor.getPlaylistsFromDb().map { playlists ->
+            if (playlists.isNullOrEmpty()) {
+                PlaylistsState.Empty
+            } else {
+                PlaylistsState.Content(playlists)
+            }
+        }.asLiveData()
 }

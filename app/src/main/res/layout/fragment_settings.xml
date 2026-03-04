@@ -41,7 +41,7 @@
 
         <TextView
             style="@style/TextViewSettings"
-            android:text="@string/share"
+            android:text="@string/share_app"
             android:textAppearance="@style/YSRegular16" />
 
         <ImageView

@@ -12,7 +12,7 @@ import com.practicum.playlistmaker.databinding.ItemTrackBinding
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.utils.dpToPx
 
-class TracksAdapter(private val onItemClick: (Track) -> Unit) :
+open class TracksAdapter(private val onItemClick: (Track) -> Unit) :
     ListAdapter<Track, TracksAdapter.TrackViewHolder>(TrackDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {

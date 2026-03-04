@@ -1,7 +1,6 @@
 package com.practicum.playlistmaker.ui.audioplayer.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +17,7 @@ import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentAudioPlayerBinding
 import com.practicum.playlistmaker.domain.models.Playlist
 import com.practicum.playlistmaker.ui.audioplayer.adapters.PlaylistsBottomSheetAdapter
-import com.practicum.playlistmaker.ui.audioplayer.controller.BottomSheetController
+import com.practicum.playlistmaker.ui.common.controller.BottomSheetController
 import com.practicum.playlistmaker.ui.audioplayer.view_model.AudioPlayerViewModel
 import com.practicum.playlistmaker.ui.audioplayer.view_model.PlayerState
 import com.practicum.playlistmaker.ui.audioplayer.view_model.PlaylistsState
@@ -32,7 +31,6 @@ import org.koin.core.parameter.parametersOf
 
 class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
     private var track: TrackParcelable? = null
-    override val applyBottomInset = true
     private lateinit var playlistsAdapter: PlaylistsBottomSheetAdapter
     private val albumCornerRadiusDp: Float = ALBUM_CORNER_RADIUS_DP
     private val viewModel: AudioPlayerViewModel by viewModel {
@@ -59,7 +57,7 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         val albumCornerRadiusPx = requireContext().dpToPx(albumCornerRadiusDp)
-        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetTracks)
         bottomSheetController = BottomSheetController(bottomSheetBehavior, binding.dimView)
         bottomSheetController.init()
 
