@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.domain.api.db.PlaylistsInteractor
 import com.practicum.playlistmaker.domain.api.sharing.SharingInteractor
-import com.practicum.playlistmaker.domain.models.Playlist
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.ui.common.UIText
 import com.practicum.playlistmaker.utils.toMillis
