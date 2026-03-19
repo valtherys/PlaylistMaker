@@ -55,20 +55,12 @@ class AudioPlayerViewModel(
         _playerStateLiveData.postValue(PlayerState.Prepared)
     }
 
-    override fun onPlayerStart() {
-        _playerStateLiveData.postValue(PlayerState.Playing)
-    }
-
     override fun onPlayerCompletion() {
         _playerStateLiveData.postValue(PlayerState.Complete)
     }
 
     override fun onPlayerChangePosition(position: Int) {
         _playerStateLiveData.value = PlayerState.TimeProgress(dateFormatter.format(position))
-    }
-
-    override fun onPlayerPause() {
-        _playerStateLiveData.postValue(PlayerState.Paused)
     }
 
     fun onPlayClicked() {

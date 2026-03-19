@@ -100,17 +100,14 @@
             app:layout_constraintTop_toBottomOf="@id/view_player_buttons"
             app:srcCompat="@drawable/ic_add_to_library_51" />
 
-        <ImageButton
+        <com.practicum.playlistmaker.ui.audioplayer.custom_views.PlaybackButtonView
             android:id="@+id/btn_play"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/add_to_playlist"
             app:layout_constraintBottom_toBottomOf="@id/view_player_buttons"
             app:layout_constraintEnd_toEndOf="@id/view_player_buttons"
             app:layout_constraintStart_toStartOf="@id/view_player_buttons"
-            app:layout_constraintTop_toBottomOf="@id/view_player_buttons"
-            app:srcCompat="@drawable/ic_play_100" />
+            app:layout_constraintTop_toBottomOf="@id/view_player_buttons" />
 
         <ImageButton
             android:id="@+id/btn_add_to_favorites"
@@ -304,7 +301,8 @@
         android:orientation="vertical"
         android:paddingHorizontal="12dp"
         app:behavior_hideable="true"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        tools:visibility="gone">
 
         <TextView
             android:id="@+id/tv_add_to_playlist"

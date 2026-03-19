@@ -60,7 +60,6 @@ class AudioPlayer(var mediaPlayer: MediaPlayer) {
         mediaPlayer.start()
         startTimer()
         playerState = PlayerState.STATE_PLAYING
-        listener?.onPlayerStart()
     }
 
     fun pausePlayer() {
@@ -68,7 +67,6 @@ class AudioPlayer(var mediaPlayer: MediaPlayer) {
             mediaPlayer.pause()
             updateTimerJob?.cancel()
             playerState = PlayerState.STATE_PAUSED
-            listener?.onPlayerPause()
         }
     }
 
