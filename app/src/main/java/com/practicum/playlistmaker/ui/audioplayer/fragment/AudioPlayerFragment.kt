@@ -110,6 +110,7 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
     override fun onPause() {
         super.onPause()
         viewModel.onPause()
+        binding.btnPlay.toggleBtn(true)
     }
 
     private fun bindData(track: TrackParcelable, cornerRadiusPx: Int) {
@@ -145,16 +146,8 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
         }
     }
 
-    fun onPlayerStart() {
-        binding.btnPlay.setImageResource(R.drawable.ic_pause_100)
-    }
-
     fun onPlayerChangePosition(position: String) {
         binding.tvTimer.text = position
-    }
-
-    fun onPlayerPause() {
-        binding.btnPlay.setImageResource(R.drawable.ic_play_100)
     }
 
     fun onPlayerPrepared() {
@@ -163,7 +156,7 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
 
     fun onPlayerCompletion() {
         binding.apply {
-            btnPlay.setImageResource(R.drawable.ic_play_100)
+            btnPlay.toggleBtn(true)
             tvTimer.text = getString(R.string.count_start)
         }
     }
@@ -203,8 +196,6 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
     private fun renderPlayer(state: PlayerState) {
         when (state) {
             PlayerState.Default -> binding.btnPlay.isEnabled = false
-            PlayerState.Paused -> onPlayerPause()
-            PlayerState.Playing -> onPlayerStart()
             PlayerState.Prepared -> onPlayerPrepared()
             PlayerState.Complete -> onPlayerCompletion()
             is PlayerState.TimeProgress -> onPlayerChangePosition(state.progress)

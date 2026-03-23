@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PlaybackButtonView">
+        <attr name="btnPlay" format="reference" />
+        <attr name="btnPause" format="reference" />
+    </declare-styleable>
+
+    <style name="PlaybackBottonViewStyle">
+        <item name="btnPlay">@drawable/ic_play_100</item>
+        <item name="btnPause">@drawable/ic_pause_100</item>
+    </style>
+
+    <style name="DefPlaybackButtonViewStyle">
+        <item name="backgroundColor">?attr/colorOnPrimary</item>
+    </style>
+</resources>
