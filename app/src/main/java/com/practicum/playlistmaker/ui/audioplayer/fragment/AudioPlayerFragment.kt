@@ -1,12 +1,20 @@
 package com.practicum.playlistmaker.ui.audioplayer.fragment
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.Group
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,14 +25,15 @@ import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentAudioPlayerBinding
 import com.practicum.playlistmaker.domain.models.Playlist
 import com.practicum.playlistmaker.ui.audioplayer.adapters.PlaylistsBottomSheetAdapter
-import com.practicum.playlistmaker.ui.common.controller.BottomSheetController
 import com.practicum.playlistmaker.ui.audioplayer.view_model.AudioPlayerViewModel
 import com.practicum.playlistmaker.ui.audioplayer.view_model.PlayerState
 import com.practicum.playlistmaker.ui.audioplayer.view_model.PlaylistsState
 import com.practicum.playlistmaker.ui.audioplayer.view_model.TrackEvents
 import com.practicum.playlistmaker.ui.common.BindingFragment
+import com.practicum.playlistmaker.ui.common.controller.BottomSheetController
 import com.practicum.playlistmaker.ui.common.snackbar.CustomSnackbar
 import com.practicum.playlistmaker.ui.models.TrackParcelable
+import com.practicum.playlistmaker.services.MusicService
 import com.practicum.playlistmaker.utils.dpToPx
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -40,6 +49,24 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
     }
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
     private lateinit var bottomSheetController: BottomSheetController
+    private var musicService: MusicService? = null
+    private var foregroundIsInitialized = false
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(
+            name: ComponentName?,
+            service: IBinder?
+        ) {
+            val binder = service as MusicService.MusicServiceBinder
+            musicService = binder.getService()
+            viewModel.setAudioPlayerEventListener(binder.getService())
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            musicService = null
+        }
+    }
+    private lateinit var intent: Intent
+    private var isPlaying = false
 
     override fun createBinding(
         inflater: LayoutInflater,
@@ -50,12 +77,46 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        track = arguments?.getParcelable(ARG_TRACK)
+        track = arguments?.getParcelable(ARG_TRACK, TrackParcelable::class.java)
+        intent = Intent(requireActivity(), MusicService::class.java).apply {
+            putExtra(MusicService.ARG_TRACK, track)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.onFragmentStart()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (isPlaying) {
+            if (!foregroundIsInitialized) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                } else {
+                    ContextCompat.startForegroundService(requireContext(), intent)
+                }
+                foregroundIsInitialized = true
+            }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (isPlaying) {
+            viewModel.onFragmentStop()
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        unbindMusicService()
+        requireContext().stopService(intent)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         val albumCornerRadiusPx = requireContext().dpToPx(albumCornerRadiusDp)
         bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetTracks)
         bottomSheetController = BottomSheetController(bottomSheetBehavior, binding.dimView)
@@ -69,9 +130,11 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
         track?.let {
             bindData(it, albumCornerRadiusPx)
         }
+        bindMusicService()
 
         binding.btnPlay.setOnClickListener {
             viewModel.onPlayClicked()
+            isPlaying = !isPlaying
         }
 
         binding.btnBack.setOnClickListener {
@@ -105,12 +168,6 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
         viewModel.observeBottomSheetState()
             .observe(viewLifecycleOwner) { bottomSheetController.toggleBottomSheet(it) }
         viewModel.checkTrackIsFavorite(track?.trackId!!)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        viewModel.onPause()
-        binding.btnPlay.toggleBtn(true)
     }
 
     private fun bindData(track: TrackParcelable, cornerRadiusPx: Int) {
@@ -158,6 +215,7 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
         binding.apply {
             btnPlay.toggleBtn(true)
             tvTimer.text = getString(R.string.count_start)
+            isPlaying = false
         }
     }
 
@@ -222,10 +280,25 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
         }
     }
 
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) ContextCompat.startForegroundService(requireContext(), intent)
+            else CustomSnackbar(requireActivity().findViewById<LinearLayout>(R.id.main)).show(
+                getString(R.string.permission_required)
+            )
+        }
+
+    private fun bindMusicService() {
+        requireContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+    }
+
+    private fun unbindMusicService() {
+        requireContext().unbindService(serviceConnection)
+    }
+
     companion object {
         const val ARG_TRACK = "TRACK"
         private const val ALBUM_CORNER_RADIUS_DP = 8f
-
         fun createArgs(track: TrackParcelable): Bundle =
             bundleOf(ARG_TRACK to track)
     }

@@ -17,7 +17,9 @@ class App : Application() {
 
         startKoin {
             androidContext(this@App)
-            modules(dataModule, repositoryModule, interactorModule, viewModelModule, utilsModule)
+            modules(
+                dataModule, repositoryModule, interactorModule, viewModelModule, utilsModule
+            )
         }
 
         val userSettingsInteractor: UserSettingsInteractor by inject()

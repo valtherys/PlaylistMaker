@@ -9,33 +9,31 @@ import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.domain.api.db.FavoritesInteractor
 import com.practicum.playlistmaker.domain.api.db.PlaylistsInteractor
 import com.practicum.playlistmaker.domain.api.player.AudioPlayerEventListener
-import com.practicum.playlistmaker.domain.api.player.AudioPlayerInteractor
 import com.practicum.playlistmaker.domain.models.Playlist
 import com.practicum.playlistmaker.ui.common.SingleEvent
 import com.practicum.playlistmaker.ui.models.TrackParcelable
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 
 class AudioPlayerViewModel(
-    private val audioPlayerInteractor: AudioPlayerInteractor,
     private val tracksDbInteractor: FavoritesInteractor,
     private val playlistsDbInteractor: PlaylistsInteractor,
-    private val dateFormatter: SimpleDateFormat,
     private val track: TrackParcelable,
-) : ViewModel(), AudioPlayerEventListener {
+) : ViewModel() {
     private val _playerStateLiveData = MutableLiveData<PlayerState>(PlayerState.Default)
     fun observePlayerState(): LiveData<PlayerState> = _playerStateLiveData
+    private var audioPlayerEventListener: AudioPlayerEventListener? = null
 
-    val playlistsStateLiveData: LiveData<PlaylistsState> = playlistsDbInteractor.getPlaylistsFromDb()
-        .map { playlists ->
-            if (playlists.isNullOrEmpty()) {
-                PlaylistsState.Empty
-            } else {
-                PlaylistsState.Playlists(playlists)
+    val playlistsStateLiveData: LiveData<PlaylistsState> =
+        playlistsDbInteractor.getPlaylistsFromDb()
+            .map { playlists ->
+                if (playlists.isNullOrEmpty()) {
+                    PlaylistsState.Empty
+                } else {
+                    PlaylistsState.Playlists(playlists)
+                }
             }
-        }
-        .asLiveData()
+            .asLiveData()
 
     private val _trackEvents = MutableLiveData<SingleEvent<TrackEvents>>()
     fun observeTrackEvents(): LiveData<SingleEvent<TrackEvents>> = _trackEvents
@@ -44,31 +42,20 @@ class AudioPlayerViewModel(
     fun observeBottomSheetState(): LiveData<Boolean> = _bottomSheetIsVisible
 
     init {
-        audioPlayerInteractor.setStateListener(this)
-        audioPlayerInteractor.preparePlayer(track.previewUrl)
         checkTrackIsFavorite(track.trackId)
-        _playerStateLiveData.value =
-            PlayerState.TimeProgress(dateFormatter.format(INITIAL_PROGRESS))
     }
+    fun setAudioPlayerEventListener(audioPlayerEventListener: AudioPlayerEventListener) {
+        this.audioPlayerEventListener = audioPlayerEventListener
 
-    override fun onPlayerPrepared() {
-        _playerStateLiveData.postValue(PlayerState.Prepared)
-    }
-
-    override fun onPlayerCompletion() {
-        _playerStateLiveData.postValue(PlayerState.Complete)
-    }
-
-    override fun onPlayerChangePosition(position: Int) {
-        _playerStateLiveData.value = PlayerState.TimeProgress(dateFormatter.format(position))
+        viewModelScope.launch {
+            audioPlayerEventListener.providePlayerState().collect() {
+                _playerStateLiveData.postValue(it)
+            }
+        }
     }
 
     fun onPlayClicked() {
-        audioPlayerInteractor.playbackControl()
-    }
-
-    fun onPause() {
-        audioPlayerInteractor.pausePlayer()
+        audioPlayerEventListener?.playbackControl()
     }
 
     fun onFavoriteClicked(track: TrackParcelable) {
@@ -81,17 +68,24 @@ class AudioPlayerViewModel(
         _playerStateLiveData.postValue(PlayerState.Favorite(!track.isFavorite))
     }
 
+    fun onFragmentStop(){
+        audioPlayerEventListener?.startForeground()
+    }
+
+    fun onFragmentStart(){
+        audioPlayerEventListener?.stopForeground()
+    }
+
     fun checkTrackIsFavorite(trackId: String) {
         viewModelScope.launch {
             tracksDbInteractor.checkTrackIsFavorite(trackId).collect { id ->
                 _playerStateLiveData.postValue(
-                    PlayerState.Favorite(
-                        !id.isNullOrEmpty()
-                    )
+                    PlayerState.Favorite(!id.isNullOrEmpty())
                 )
             }
         }
     }
+
     fun onPlaylistClicked(playlist: Playlist) {
         val trackAdded = playlist.trackIds?.contains(track.trackId) ?: false
         if (trackAdded) {
@@ -133,11 +127,6 @@ class AudioPlayerViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        audioPlayerInteractor.setStateListener(null)
-        audioPlayerInteractor.onRelease()
-    }
-
-    companion object {
-        private const val INITIAL_PROGRESS = 0
+        audioPlayerEventListener = null
     }
 }
