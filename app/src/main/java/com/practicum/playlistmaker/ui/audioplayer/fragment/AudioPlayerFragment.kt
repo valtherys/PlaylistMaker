@@ -1,12 +1,16 @@
 package com.practicum.playlistmaker.ui.audioplayer.fragment
 
+import android.Manifest
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +28,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentAudioPlayerBinding
 import com.practicum.playlistmaker.domain.models.Playlist
+import com.practicum.playlistmaker.services.MusicService
 import com.practicum.playlistmaker.ui.audioplayer.adapters.PlaylistsBottomSheetAdapter
 import com.practicum.playlistmaker.ui.audioplayer.view_model.AudioPlayerViewModel
 import com.practicum.playlistmaker.ui.audioplayer.view_model.PlayerState
@@ -33,8 +38,8 @@ import com.practicum.playlistmaker.ui.common.BindingFragment
 import com.practicum.playlistmaker.ui.common.controller.BottomSheetController
 import com.practicum.playlistmaker.ui.common.snackbar.CustomSnackbar
 import com.practicum.playlistmaker.ui.models.TrackParcelable
-import com.practicum.playlistmaker.services.MusicService
 import com.practicum.playlistmaker.utils.dpToPx
+import com.practicum.playlistmaker.utils.showDialog
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
@@ -67,6 +72,7 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
     }
     private lateinit var intent: Intent
     private var isPlaying = false
+    private var isPlayerPrepared = false
 
     override fun createBinding(
         inflater: LayoutInflater,
@@ -85,20 +91,19 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
 
     override fun onStart() {
         super.onStart()
+        updateButtonPlayIsEnabled()
         viewModel.onFragmentStart()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateButtonPlayIsEnabled()
     }
 
     override fun onPause() {
         super.onPause()
         if (isPlaying) {
-            if (!foregroundIsInitialized) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-                } else {
-                    ContextCompat.startForegroundService(requireContext(), intent)
-                }
-                foregroundIsInitialized = true
-            }
+            initializeForeground()
         }
     }
 
@@ -133,8 +138,7 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
         bindMusicService()
 
         binding.btnPlay.setOnClickListener {
-            viewModel.onPlayClicked()
-            isPlaying = !isPlaying
+            handlePlayClick()
         }
 
         binding.btnBack.setOnClickListener {
@@ -208,7 +212,8 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
     }
 
     fun onPlayerPrepared() {
-        binding.btnPlay.isEnabled = true
+        isPlayerPrepared = true
+        updateButtonPlayIsEnabled()
     }
 
     fun onPlayerCompletion() {
@@ -253,7 +258,7 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
 
     private fun renderPlayer(state: PlayerState) {
         when (state) {
-            PlayerState.Default -> binding.btnPlay.isEnabled = false
+            PlayerState.Default -> updateButtonPlayIsEnabled()
             PlayerState.Prepared -> onPlayerPrepared()
             PlayerState.Complete -> onPlayerCompletion()
             is PlayerState.TimeProgress -> onPlayerChangePosition(state.progress)
@@ -282,10 +287,9 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) ContextCompat.startForegroundService(requireContext(), intent)
-            else CustomSnackbar(requireActivity().findViewById<LinearLayout>(R.id.main)).show(
-                getString(R.string.permission_required)
-            )
+            if (!isGranted) {
+                showRationalDialog()
+            } else updateButtonPlayIsEnabled()
         }
 
     private fun bindMusicService() {
@@ -294,6 +298,71 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
 
     private fun unbindMusicService() {
         requireContext().unbindService(serviceConnection)
+    }
+
+    private fun askPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    private fun checkPermission(context: Context): Boolean {
+        return ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.POST_NOTIFICATIONS
+        ) == PERMISSION_GRANTED
+    }
+
+    private fun initializeForeground() {
+        if (!foregroundIsInitialized) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (checkPermission(requireContext())) {
+                    ContextCompat.startForegroundService(requireContext(), intent)
+                }
+            } else {
+                ContextCompat.startForegroundService(requireContext(), intent)
+            }
+            foregroundIsInitialized = true
+        }
+    }
+
+    private fun handlePlayClick() {
+        when {
+            checkPermission(requireContext()) -> {
+                viewModel.onPlayClicked()
+                isPlaying = !isPlaying
+            }
+
+            shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
+                showRationalDialog()
+            }
+
+            else -> {
+                askPermission()
+            }
+        }
+    }
+
+    private fun showRationalDialog() {
+        requireContext().showDialog(
+            titleRes = R.string.permission_required,
+            messageRes = R.string.go_to_settings,
+            positiveBtnRes = R.string.yes,
+            negativeBtnRes = R.string.no,
+            positiveAction = { openAppSettings() },
+            negativeAction = {},
+        )
+    }
+
+    private fun openAppSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", requireContext().packageName, null)
+        }
+        startActivity(intent)
+    }
+
+    private fun updateButtonPlayIsEnabled() {
+        binding.btnPlay.isEnabled = isPlayerPrepared && checkPermission(requireContext())
     }
 
     companion object {

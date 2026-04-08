@@ -28,14 +28,18 @@ internal class PlaybackButtonView @JvmOverloads constructor(
             defStyleAttr, defStyleRes
         ).apply {
             try {
-                playDrawable = context.getDrawable(getResourceId(
-                    R.styleable.PlaybackButtonView_btnPlay,
-                    R.drawable.ic_play_100
-                ))
-                pauseDrawable = context.getDrawable(getResourceId(
-                    R.styleable.PlaybackButtonView_btnPause,
-                    R.drawable.ic_pause_100
-                ))
+                playDrawable = context.getDrawable(
+                    getResourceId(
+                        R.styleable.PlaybackButtonView_btnPlay,
+                        R.drawable.ic_play_100
+                    )
+                )
+                pauseDrawable = context.getDrawable(
+                    getResourceId(
+                        R.styleable.PlaybackButtonView_btnPause,
+                        R.drawable.ic_pause_100
+                    )
+                )
                 drawable = playDrawable
             } finally {
                 recycle()
@@ -71,9 +75,11 @@ internal class PlaybackButtonView @JvmOverloads constructor(
     }
 
     fun toggleBtn(paused: Boolean = false) {
-        isPlaying = if (paused) false else !isPlaying
-        drawable = if(isPlaying) pauseDrawable else playDrawable
-        invalidate()
+        if (isEnabled) {
+            isPlaying = if (paused) false else !isPlaying
+            drawable = if (isPlaying) pauseDrawable else playDrawable
+            invalidate()
+        }
     }
 
     override fun performClick(): Boolean {

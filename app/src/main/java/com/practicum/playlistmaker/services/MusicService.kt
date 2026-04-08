@@ -28,7 +28,7 @@ internal class MusicService() : Service(),
     private val audioPlayerInteractor: AudioPlayerInteractor by inject()
     private val dateFormatter: SimpleDateFormat by inject(TRACK_TIME_CLIENT)
     private var track: TrackParcelable? = null
-    private val binder = MusicServiceBinder()
+    private val binder by lazy { MusicServiceBinder() }
     private val _playerState = MutableStateFlow<PlayerState>(PlayerState.Default)
     val playerState = _playerState.asStateFlow()
     private var foregroundDisplaying = false

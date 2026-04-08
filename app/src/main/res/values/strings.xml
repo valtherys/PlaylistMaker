@@ -75,6 +75,7 @@
     <string name="quit">Отмена</string>
     <string name="delete">Удалить</string>
     <string name="permission_required">Необходимо разрешение для прослушивания трека</string>
+    <string name="go_to_settings">Перейти в настройки для активации показа уведомлений?</string>
 
     <plurals name="track_count">
         <item quantity="zero">%d треков</item>
