@@ -18,8 +18,6 @@ val viewModelModule = module {
         AudioPlayerViewModel(
             get(),
             get(),
-            get(),
-            get(TRACK_TIME_CLIENT),
             track
         )
     }
