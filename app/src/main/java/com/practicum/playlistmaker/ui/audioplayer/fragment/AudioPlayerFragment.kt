@@ -227,7 +227,6 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
     }
 
     private fun setFavoriteBtnImg(isFavorite: Boolean) {
-        Log.d("IS_FAVORITE", "${track?.isFavorite}")
         binding.btnAddToFavorites.setImageResource(
             if (isFavorite) {
                 R.drawable.ic_remove_from_favorites_51
@@ -266,7 +265,6 @@ class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
             PlayerState.Complete -> onPlayerCompletion()
             is PlayerState.TimeProgress -> onPlayerChangePosition(state.progress)
             is PlayerState.Favorite -> {
-                Log.d("IS_FAVORITE_FUN", "${state.isFavorite}")
                 track?.isFavorite = state.isFavorite
                 setFavoriteBtnImg(state.isFavorite)
             }

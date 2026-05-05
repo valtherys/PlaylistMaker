@@ -80,7 +80,6 @@ class AudioPlayerViewModel(
     fun checkTrackIsFavorite(trackId: String) {
         viewModelScope.launch {
             tracksDbInteractor.checkTrackIsFavorite(trackId).collect { id ->
-                Log.d("IS_FAVORITE_ASKED", "${!id.isNullOrEmpty()}")
                 _playerStateLiveData.value =
                     PlayerState.Favorite(!id.isNullOrEmpty())
                 
