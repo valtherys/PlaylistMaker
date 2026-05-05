@@ -82,5 +82,5 @@ val dataModule = module {
 
     single<PlaylistTrackDao> { get<AppDatabase>().playlistTrackDao() }
 
-    single{ ImageStorage(androidContext()) }
+    single { ImageStorage(androidContext()) }
 }

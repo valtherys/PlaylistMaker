@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.ui.audioplayer.view_model
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -79,9 +80,10 @@ class AudioPlayerViewModel(
     fun checkTrackIsFavorite(trackId: String) {
         viewModelScope.launch {
             tracksDbInteractor.checkTrackIsFavorite(trackId).collect { id ->
-                _playerStateLiveData.postValue(
+                Log.d("IS_FAVORITE_ASKED", "${!id.isNullOrEmpty()}")
+                _playerStateLiveData.value =
                     PlayerState.Favorite(!id.isNullOrEmpty())
-                )
+                
             }
         }
     }
