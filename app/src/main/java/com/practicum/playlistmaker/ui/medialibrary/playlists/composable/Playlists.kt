@@ -16,8 +16,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.domain.models.Playlist
-import com.practicum.playlistmaker.ui.common.composable_items.ButtonItem
-import com.practicum.playlistmaker.ui.common.composable_items.Placeholder
+import com.practicum.playlistmaker.ui.common.composable.ButtonItem
+import com.practicum.playlistmaker.ui.common.composable.Placeholder
 import com.practicum.playlistmaker.ui.medialibrary.playlists.view_model.PlaylistsState
 import com.practicum.playlistmaker.ui.medialibrary.playlists.view_model.PlaylistsViewModel
 

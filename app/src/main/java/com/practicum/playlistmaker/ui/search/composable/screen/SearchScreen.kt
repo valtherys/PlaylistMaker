@@ -16,10 +16,10 @@ import androidx.compose.ui.unit.dp
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.ui.search.composable.CustomTextField
-import com.practicum.playlistmaker.ui.common.composable_items.Loader
-import com.practicum.playlistmaker.ui.common.composable_items.Placeholder
+import com.practicum.playlistmaker.ui.common.composable.Loader
+import com.practicum.playlistmaker.ui.common.composable.Placeholder
 import com.practicum.playlistmaker.ui.search.composable.TracksHistory
-import com.practicum.playlistmaker.ui.common.composable_items.TracksLazyColumn
+import com.practicum.playlistmaker.ui.common.composable.TracksLazyColumn
 import com.practicum.playlistmaker.ui.search.view_model.TracksState
 import com.practicum.playlistmaker.ui.search.view_model.TracksViewModel
 

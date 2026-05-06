@@ -51,6 +51,12 @@ fun MediaLibraryScreen(
             .fillMaxSize()
             .padding(start = 16.dp, top = 14.dp, end = 16.dp)
     ) {
+        Text(
+            text = stringResource(R.string.media_library),
+            modifier = Modifier.height(56.dp),
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.onPrimary,
+        )
         TabRow(
             selectedTabIndex = selectedTabIndex,
             containerColor = Color.Transparent,

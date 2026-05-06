@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.ui.common.composable_items
+package com.practicum.playlistmaker.ui.common.composable
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth

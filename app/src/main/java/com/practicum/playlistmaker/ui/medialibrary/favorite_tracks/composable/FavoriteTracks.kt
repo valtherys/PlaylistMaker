@@ -5,8 +5,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.res.stringResource
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.domain.models.Track
-import com.practicum.playlistmaker.ui.common.composable_items.Placeholder
-import com.practicum.playlistmaker.ui.common.composable_items.TracksLazyColumn
+import com.practicum.playlistmaker.ui.common.composable.Placeholder
+import com.practicum.playlistmaker.ui.common.composable.TracksLazyColumn
 import com.practicum.playlistmaker.ui.medialibrary.favorite_tracks.view_model.FavoriteTracksViewModel
 import com.practicum.playlistmaker.ui.medialibrary.favorite_tracks.view_model.FavoritesState
 

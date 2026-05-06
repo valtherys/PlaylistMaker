@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.ui.common.composable_items
+package com.practicum.playlistmaker.ui.common.composable
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -23,21 +23,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.domain.models.Track
-
-
-val track = Track(
-    trackName = "Smells Like Teen SpiritSmells Like Teen SpiritSmells Like Teen SpiritSmells Like Teen SpiritSmells Like Teen SpiritSmells Like Teen Spirit",
-    artistName = "Nirvana",
-    trackTime = "5:01",
-    artworkUrl100 = "https://is5-ssl.mzstatic.com/image/thumb/Music115/v4/7b/58/c2/7b58c21a-2b51-2bb2-e59a-9bb9b96ad8c3/00602567924166.rgb.jpg/100x100bb.jpg",
-    trackId = "wkefhwue",
-    collectionName = "Teen Spirit",
-    releaseDate = "1999",
-    primaryGenreName = "rock",
-    country = "Great Britain",
-    previewUrl = "https://is5-ssl.mzstatic.com/image/thumb/Music115/v4/7b/58/c2/7b58c21a-2b51-2bb2-e59a-9bb9b96ad8c3/00602567924166.rgb.jpg/100x100bb.jpg",
-    isFavorite = false
-)
+import com.practicum.playlistmaker.ui.theme.AppTheme
 
 @Composable
 fun TrackItem(track: Track, onTrackClick: (Track) -> Unit, modifier: Modifier) {
@@ -106,9 +92,24 @@ fun TrackItem(track: Track, onTrackClick: (Track) -> Unit, modifier: Modifier) {
     }
 }
 
+private val track = Track(
+    trackName = "Smells Like Teen SpiritSmells Like Teen SpiritSmells Like Teen SpiritSmells Like Teen SpiritSmells Like Teen SpiritSmells Like Teen Spirit",
+    artistName = "Nirvana",
+    trackTime = "5:01",
+    artworkUrl100 = "https://is5-ssl.mzstatic.com/image/thumb/Music115/v4/7b/58/c2/7b58c21a-2b51-2bb2-e59a-9bb9b96ad8c3/00602567924166.rgb.jpg/100x100bb.jpg",
+    trackId = "wkefhwue",
+    collectionName = "Teen Spirit",
+    releaseDate = "1999",
+    primaryGenreName = "rock",
+    country = "Great Britain",
+    previewUrl = "https://is5-ssl.mzstatic.com/image/thumb/Music115/v4/7b/58/c2/7b58c21a-2b51-2bb2-e59a-9bb9b96ad8c3/00602567924166.rgb.jpg/100x100bb.jpg",
+    isFavorite = false
+)
 
 @Preview(showSystemUi = true)
 @Composable
-fun TrackPreview() {
-    TrackItem(track, onTrackClick = {}, Modifier)
+private fun TrackPreview() {
+    AppTheme {
+        TrackItem(track, onTrackClick = {}, Modifier)
+    }
 }

@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.ui.common.composable_items
+package com.practicum.playlistmaker.ui.common.composable
 
 
 import androidx.annotation.DrawableRes
@@ -19,8 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.ui.theme.AppTheme
 
 @Composable
 fun Placeholder(
@@ -53,5 +55,16 @@ fun Placeholder(
                 onClickAction = onClickAction
             )
         }
+    }
+}
+
+@Preview(showSystemUi = true, showBackground = true)
+@Composable
+private fun PlaceholderPreview() {
+    AppTheme {
+        Placeholder(
+            imageRes = R.drawable.ic_nothing_found_120,
+            placeholderText = stringResource(R.string.nothing_found),
+        )
     }
 }
