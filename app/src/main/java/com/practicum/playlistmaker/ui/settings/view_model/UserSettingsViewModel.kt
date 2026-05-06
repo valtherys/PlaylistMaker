@@ -1,23 +1,24 @@
 package com.practicum.playlistmaker.ui.settings.view_model
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.practicum.playlistmaker.domain.api.settings.UserSettingsInteractor
 import com.practicum.playlistmaker.domain.api.sharing.SharingInteractor
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class UserSettingsViewModel(
     private val themeInteractor: UserSettingsInteractor,
     private val sharingInteractor: SharingInteractor
 ) : ViewModel() {
-    private val isThemeDarkLiveData = MutableLiveData(themeInteractor.getSavedTheme())
-    fun observeThemeValue(): LiveData<Boolean> = isThemeDarkLiveData
+    private val _isThemeDark = MutableStateFlow(themeInteractor.getSavedTheme())
+    val isThemeDark: StateFlow<Boolean> = _isThemeDark.asStateFlow()
 
     fun onSwitchTheme(param: Boolean) {
         if (themeInteractor.getSavedTheme() != param) {
             themeInteractor.switchTheme(param)
             val newTheme = themeInteractor.getSavedTheme()
-            isThemeDarkLiveData.postValue(newTheme)
+            _isThemeDark.value = newTheme
         }
     }
 

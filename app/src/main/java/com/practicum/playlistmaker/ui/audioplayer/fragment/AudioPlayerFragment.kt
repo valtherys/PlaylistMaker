@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,6 +43,7 @@ import com.practicum.playlistmaker.utils.dpToPx
 import com.practicum.playlistmaker.utils.showDialog
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
+import kotlin.text.isNullOrEmpty
 
 class AudioPlayerFragment : BindingFragment<FragmentAudioPlayerBinding>() {
     private var track: TrackParcelable? = null
